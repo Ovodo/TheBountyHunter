@@ -25,3 +25,8 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+.highlighted {
+  scale: 1.2;
+  background-color: rgb(174, 93, 46);
+}

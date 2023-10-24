@@ -1,118 +1,230 @@
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
+`use Client`;
+import Image from "next/image";
+import { Inter } from "next/font/google";
+import { Metal_Mania } from "next/font/google";
+import { Poppins } from "next/font/google";
+import React, { useEffect, useState } from "react";
 
-const inter = Inter({ subsets: ['latin'] })
+import dynamic from "next/dynamic";
+import usePassport from "@/hooks/usePassport";
+import { checkoutWidgets } from "@imtbl/sdk";
+import { log } from "console";
+import { useRouter } from "next/router";
+
+const inter = Inter({ subsets: ["latin"] });
+const metal = Metal_Mania({ weight: "400", subsets: ["latin-ext"] });
+const poppins = Poppins({ weight: "500", subsets: ["devanagari"] });
+
+type User = {
+  email: String | undefined;
+  nickname: String | undefined;
+};
 
 export default function Home() {
+  const [user, setUser] = React.useState<string | null>(null);
+  const [address, setAddress] = React.useState<string | null>(null);
+  const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>(0);
+  const [audio, setAudio] = useState<HTMLAudioElement>();
+  const [enterAudio, setEnterAudio] = useState<HTMLAudioElement>();
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const menuItems = ["Start", "Options", "Shop", "Difficulty", "Hunter"];
+  const route = ["/arena", "Options", "Shop", "Difficulty", "Hunter"];
+  const router = useRouter();
+
+  const Login = async () => {
+    if (window !== undefined) {
+      const { passports, provider } = usePassport();
+      const accounts = await provider.request({
+        method: "eth_requestAccounts",
+      });
+
+      sessionStorage.setItem("address", accounts[0] as string);
+      setAddress(sessionStorage.getItem("address"));
+
+      console.log(accounts);
+    }
+  };
+  const Logout = async () => {
+    if (window !== undefined) {
+      const { passports, provider } = usePassport();
+      await passports.logout();
+    }
+  };
+  const Info = async () => {
+    if (window !== undefined) {
+      const { passports, provider } = usePassport();
+      let user = await passports.getUserInfo();
+      if (user) {
+        sessionStorage.setItem("name", user.email?.split("@")[0] as string);
+        setUser(sessionStorage.getItem("name"));
+      }
+
+      try {
+        const accessToken: string | undefined =
+          await passports.getAccessToken();
+        const idToken: string | undefined = await passports.getIdToken();
+        const user = await passports.getUserInfo();
+        console.log("User", user);
+        console.log("id", idToken);
+        console.log("access", accessToken);
+      } catch (error: any) {
+        console.log("Error occured", error);
+      }
+    }
+  };
+  console.log(user, address);
+
+  useEffect(() => {
+    setUser(sessionStorage.getItem("name"));
+    setAddress(sessionStorage.getItem("address"));
+  }, []);
+  function handleKeyDown(event: KeyboardEvent) {
+    switch (event.key) {
+      case "ArrowUp":
+        setSelectedMenuIndex((prev) => (prev - 1 < 0 ? 0 : prev - 1));
+        if (audio) {
+          audio.currentTime = 0;
+          audio.volume = 0.5;
+          audio
+            .play()
+            .catch((error) => console.error("Audio play failed:", error));
+
+          setIsPlaying(true);
+          audio.addEventListener("ended", () => setIsPlaying(false));
+        }
+        break;
+      case "ArrowDown":
+        setSelectedMenuIndex((prev) =>
+          prev + 1 >= menuItems.length ? menuItems.length - 1 : prev + 1
+        );
+        if (audio) {
+          audio.currentTime = 0;
+          audio
+            .play()
+            .catch((error) => console.error("Audio play failed:", error));
+
+          setIsPlaying(true);
+          audio.addEventListener("ended", () => setIsPlaying(false));
+        }
+        break;
+      case "Enter":
+        if (enterAudio) {
+          enterAudio.currentTime = 0;
+          enterAudio.volume = 1;
+          enterAudio
+            .play()
+            .catch((error) => console.error("Audio play failed:", error));
+
+          setIsPlaying(true);
+          enterAudio.addEventListener("ended", () => setIsPlaying(false));
+        }
+        handleMenuAction(selectedMenuIndex);
+        break;
+    }
+  }
+
+  function handleMenuAction(x: number) {
+    router.push(route[x]);
+  }
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedMenuIndex]);
+  React.useEffect(() => {
+    setEnterAudio(new Audio("soft.mp3"));
+    setAudio(new Audio("click.wav"));
+  }, []);
+
   return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
-    >
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">pages/index.tsx</code>
+    <div className='relative [background:linear-gradient(90deg,rgba(0,0,0,0.8)_1.46%,rgba(13.63,20.14,12,0.72)_13.34%,rgba(50.7,74.92,44.64,0.5)_27.53%,rgba(91.64,135.43,80.69,0.26)_50.29%,rgba(135.88,200.81,119.65,0.04)_56.65%,rgba(103.44,163.01,88.54,0.21)_63.93%,rgba(48.61,99.14,35.98,0.56)_73.16%,rgba(22.79,69.06,11.22,0.72)_83.68%)]   flex flex-row justify-center w-full'>
+      <div className='flex overflow-hidden items-center justify-center  h-screen relative'>
+        <img className='cover' src='/assets/images/hunter-1.png' alt='' />
+        <p
+          style={{
+            WebkitTextStroke: "1px #000000",
+            backgroundImage:
+              "linear-gradient(180deg, rgb(248,255,213) 16.3%, rgb(174,93,46) 58.56%, rgb(255,236,170) 76.24%, rgb(239,255,213) 100%)",
+          }}
+          className={`absolute left-2 top-6 ${metal.className} w-[300px]    bg-clip-text [-webkit-text-fill-color:transparent] [text-fill-color:transparent] text-transparent text-[84px] animate-puls tracking-[0] leading-[normal]`}
+        >
+          the BOUntY HUNteR
         </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        <p
+          style={{
+            WebkitTextStroke: "1px #000000",
+            backgroundImage:
+              "linear-gradient(180deg, rgb(248,255,213) 86.3%, rgb(174,93,46) 58.56%, rgb(255,236,170) 76.24%, rgb(239,255,213) 100%)",
+          }}
+          className={`absolute left-2 top-[400px] animate-bounce ${metal.className} w-[300px] bg-clip-text [-webkit-text-fill-color:transparent] [text-fill-color:transparent] text-transparent text-[20px]  tracking-[0] leading-[normal]`}
+        >
+          Connect your passport to begin
+        </p>
+        <button
+          // disabled={address ? true : false}
+          onClick={Login}
+          className={`px-6 ${user} disabled:text-[rgb(174,93,46)] disabled:opacity-50 disabled:scale-100 disabled:bg-[rgb(248,255,233)] disabled:text-base  absolute hover:text-lg left-2 top-[500px] active:scale-95 duration-200 hover:bg-[rgb(174,93,46)] hover:text-[rgb(248,255,213)] ${metal.className} py-2 rounded-md bg-[rgb(248,255,213)]`}
+        >
+          {address == null ? "Connected" : "Connect"}
+        </button>
+        <button
+          onClick={Logout}
+          className={`px-6 absolute hover:text-lg left-2 top-[580px] active:scale-95 duration-200 hover:bg-[rgb(174,93,46)] hover:text-[rgb(248,255,213)] ${metal.className} py-2 rounded-md bg-[rgb(248,255,213)]`}
+        >
+          Leave
+        </button>
+        <button
+          onClick={Info}
+          className={`px-6 absolute hover:text-lg left-2 top-[660px] active:scale-95 duration-200 hover:bg-[rgb(174,93,46)] hover:text-[rgb(248,255,213)] ${metal.className} py-2 rounded-md bg-[rgb(248,255,213)]`}
+        >
+          Info
+        </button>
+      </div>
+      <p
+        className={`absolute capitalize  right-0 bottom-[20px]  ${poppins.className} w-[300px]  text-[rgb(248,255,213)] text-lg  tracking-[1] leading-[normal]`}
+      >
+        {user ? user : "Unknown"}
+      </p>
+      <div
+        className={`absolute flex flex-col  self-center  right-[180px] space-y-8 top-[50px]  ${poppins.className} justify-center items-start text-lg  tracking-[1] leading-[normal]`}
+      >
+        {menuItems.map((item, index) => (
+          <button
+            onClick={Login}
+            className={`px-6 ${
+              selectedMenuIndex === index ? "highlighted" : ""
+            }  active:scale-95 duration-200 hover:bg-[rgb(174,93,46)]248,255,213)] ${
+              metal.className
+            } py-2 rounded-md bg-[rgb(248,255,213)]`}
           >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
+            {item}
+          </button>
+        ))}
       </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700/10 after:dark:from-sky-900 after:dark:via-[#0141ff]/40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Discover and deploy boilerplate example Next.js&nbsp;projects.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+    </div>
+  );
 }
+
+// <div className='w-[70vw] mx-auto flex justify-around'>
+//   <button
+//     onClick={Login}
+//     className='text-lg bg-pink-400 shadow-sm shadow-purple-400 text-md px-5 py-2 rounded-sm hover:bg-pink-300 hover:text-yellow-200 duration-500 '
+//   >
+//     Login
+//   </button>
+//   <button
+//     onClick={Logout}
+//     className='text-lg bg-cyan-400 shadow-sm shadow-purple-400 text-md px-5 py-2 rounded-sm hover:bg-pink-300 hover:text-yellow-200 duration-500 '
+//   >
+//     Logout
+//   </button>
+//   <button
+//     onClick={Info}
+//     className='text-lg bg-cyan-400 shadow-sm shadow-purple-400 text-md px-5 py-2 rounded-sm hover:bg-pink-300 hover:text-yellow-200 duration-500 '
+//   >
+//     Info
+//   </button>
+//   {/* <checkoutWidgets.ConnectReact />; */}
+// </div>
