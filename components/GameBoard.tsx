@@ -6,19 +6,21 @@ import { Poppins } from "next/font/google";
 import { motion } from "framer-motion";
 import { set } from "mongoose";
 import { useRouter } from "next/router";
+import useSound from "use-sound";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { decTries, setWinner } from "@/redux/features/gameSlice";
 
 interface Props {
   level: number;
+  stops: any;
 }
 
 const pop = Poppins({ weight: "700", subsets: ["latin-ext"] });
 
-const GameBoard: React.FC<Props> = ({ level }) => {
+const GameBoard: React.FC<Props> = ({ level, stops }) => {
   const [board, setBoard] = useState<string[][]>(generateBoard(level));
   const [message, setMessage] = useState<string>("");
   const [open, setOpen] = useState<boolean>(false);
-  const [winner, setWinner] = useState<boolean>(false);
-  const [tries, setTries] = useState<number>(4 * level);
   const [hints, setHints] = useState<number>(level);
   const [hunterMoney, setHunterMoney] = useState<number>(0);
   const [audio, setAudio] = useState<HTMLAudioElement>();
@@ -29,6 +31,12 @@ const GameBoard: React.FC<Props> = ({ level }) => {
   const [clickedSlot, setClickedSlot] = useState<[number, number] | null>(null);
   const slotWidth: String = (100 / (3 * level)) as unknown as string; // Calculate the width percentage
   const router = useRouter();
+  const [play, { stop }] = useSound("/tony.mp3", { volume: 0.7 });
+  const [play2, { stop2 }] = useSound("/door.wav", { volume: 0.7 });
+  const [cheer, { cheerStop }] = useSound("/cheer.mp3", { volume: 0.7 });
+  const { timer, tries, hint, winner } = useAppSelector((state) => state.App);
+  const dispatch = useAppDispatch();
+
   //  ---------------------------------Functions and Effects
 
   function generateBoard(level: number): string[][] {
@@ -104,11 +112,12 @@ const GameBoard: React.FC<Props> = ({ level }) => {
     //   setMessage("Game over! No tries left.");
     //   return;
     // }
+    play2();
     setOpen(!open);
     setClickedSlot([x, y]);
     if (board[x][y] === "Criminal") {
       setMessage("You found the criminal!");
-      setWinner(true);
+      dispatch(setWinner(true));
     } else if (hintBoard[x][y]) {
       setMessage(hintBoard[x][y]);
     } else if (board[x][y] === "Decoy") {
@@ -124,7 +133,7 @@ const GameBoard: React.FC<Props> = ({ level }) => {
     // } else {
     //   setMessage("Empty! Keep searching.");
     // }
-    setTries(tries - 1);
+    dispatch(decTries());
   }
 
   function giveHint(): void {
@@ -132,7 +141,8 @@ const GameBoard: React.FC<Props> = ({ level }) => {
       setMessage("No hints left!");
       return;
     }
-
+    // play();
+    stop();
     setHints(hints - 1);
   }
 
@@ -153,9 +163,11 @@ const GameBoard: React.FC<Props> = ({ level }) => {
       // Adjust this time to speed up or slow down the increment
 
       if (!isPlaying && audio) {
+        audio.volume = 1;
         audio
           .play()
           .catch((error) => console.error("Audio play failed:", error));
+        cheer();
 
         setIsPlaying(true);
         audio.addEventListener("ended", () => setIsPlaying(false));
@@ -175,7 +187,9 @@ const GameBoard: React.FC<Props> = ({ level }) => {
   }, []);
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, x: -500 }}
+      animate={{ opacity: 1, x: 0 }}
       className={`flex  ${
         tries == 0 || winner ? "bg-[#2C2C54]" : "bg-white"
       }  h-full flex-wrap mb-3 w-full`}
@@ -185,39 +199,6 @@ const GameBoard: React.FC<Props> = ({ level }) => {
           💼: 💲{hunterMoney}
         </span>
       </div>
-      {tries == 0 && !winner && (
-        <div
-          className={`z-50 ${pop.className} absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 w-[35vw] h-[35vw] flex items-center justify-center `}
-        >
-          <motion.div
-            className='bg-white rounded-md flex items-center justify-center  w-full h-full'
-            initial={{ scale: 0 }}
-            animate={{ scale: 0.75, rotate: 720 * 2 }}
-          >
-            <p className='animate-bounce text-2xl text-[#2c2c54]'>
-              Game Over!!!.. Restart
-            </p>
-          </motion.div>
-        </div>
-      )}
-
-      {winner && (
-        <div
-          className={`z-50 ${pop.className} absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 w-[35vw] h-[35vw] flex items-center justify-center `}
-        >
-          <motion.div
-            className='bg-white rounded-md flex items-center justify-center  w-full h-full'
-            initial={{ scale: 0 }}
-            animate={{ scale: 0.75, rotate: 720 * 2 }}
-          >
-            <p className='animate-bounce flex flex-col space-y-4 text-center text-2xl text-[#2c2c54]'>
-              Congratulations. You caught the Pirate. 🏆{" "}
-              <span>$10,000 reward bounty</span>
-              💰
-            </p>
-          </motion.div>
-        </div>
-      )}
       <div className='absolute space-x-10 left-6 bottom-8'>
         <button
           className={`px-6 active:scale-95 duration-200 hover:bg-[rgb(174,93,46)] hover:text-[rgb(248,255,213)] ${pop.className} py-2 rounded-md bg-[rgb(248,255,213)]`}
@@ -227,7 +208,11 @@ const GameBoard: React.FC<Props> = ({ level }) => {
         </button>
         <button
           className={`px-6 active:scale-95 duration-200 hover:bg-[rgb(174,93,46)] hover:text-[rgb(248,255,213)] ${pop.className} py-2 rounded-md bg-[rgb(248,255,213)]`}
-          onClick={() => router.back()}
+          onClick={() => {
+            router.push("/");
+            stops();
+            play();
+          }}
         >
           Back
         </button>
@@ -278,14 +263,15 @@ const GameBoard: React.FC<Props> = ({ level }) => {
                     ? //  && open
                       "-translate-y-[95%]"
                     : ""
-                } bg-[#C89933] z-2 relative duration-1000 h-full border border-teal-950 flex justify-center items-center`}
+                } bg-[#C89933] ${
+                  tries == level * 4 ? "translate-y-[0%]" : ""
+                } z-20 relative duration-[3000ms] h-full border border-teal-950 flex justify-center items-center`}
               >
                 <button
                   className='absolute right-2 top-[65%]'
                   onClick={() => handleClick(x, y)}
                 >
                   🔘
-                  {/* {hintBoard[x][y]} */}
                 </button>
               </div>
               <p
@@ -294,13 +280,12 @@ const GameBoard: React.FC<Props> = ({ level }) => {
                 {clickedSlot && clickedSlot[0] === x && clickedSlot[1] === y
                   ? message
                   : ""}
-                {/* {board[x][y]} */}
               </p>
             </div>
           ))}
         </div>
       ))}
-    </div>
+    </motion.div>
   );
 };
 
