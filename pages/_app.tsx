@@ -5,6 +5,7 @@ import { Router, useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import PageLoader from "@/components/layout/PageLoader";
 import { Providers } from "@/redux/provider";
+import { GameSoundsProvider } from "@/hooks/GameContext";
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -25,6 +26,15 @@ export default function App({ Component, pageProps }: AppProps) {
       Router.events.off("routeChangeComplete", end);
       Router.events.off("routeChangeError", end);
     };
+  }, []);
+  useEffect(() => {
+    window.history.pushState(null, document.title, window.location.href);
+    window.onpopstate = function () {
+      window.history.go(1);
+    };
+
+    // Clean up - remove the event listener when the component is unmounted
+    return () => {};
   }, []);
   return loading ? (
     <PageLoader loading={loading} />

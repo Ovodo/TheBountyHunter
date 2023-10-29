@@ -9,22 +9,18 @@ import { useRouter } from "next/router";
 import useSound from "use-sound";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { decTries, setWinner } from "@/redux/features/gameSlice";
-
-interface Props {
-  level: number;
-  stops: any;
-}
+import useGameSounds from "@/hooks/useGameSounds";
 
 const pop = Poppins({ weight: "700", subsets: ["latin-ext"] });
 
-const GameBoard: React.FC<Props> = ({ level, stops }) => {
+const GameBoard: React.FC = () => {
+  const { timer, tries, hint, winner, level } = useAppSelector(
+    (state) => state.App
+  );
   const [board, setBoard] = useState<string[][]>(generateBoard(level));
   const [message, setMessage] = useState<string>("");
   const [open, setOpen] = useState<boolean>(false);
-  const [hints, setHints] = useState<number>(level);
-  const [hunterMoney, setHunterMoney] = useState<number>(0);
-  const [audio, setAudio] = useState<HTMLAudioElement>();
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [hints, setHints] = useState<number>(hint);
   const [hintBoard, setHintBoard] = useState<string[][]>(
     generateHintBoard(board)
   );
@@ -32,10 +28,9 @@ const GameBoard: React.FC<Props> = ({ level, stops }) => {
   const slotWidth: String = (100 / (3 * level)) as unknown as string; // Calculate the width percentage
   const router = useRouter();
   const [play, { stop }] = useSound("/tony.mp3", { volume: 0.7 });
-  const [play2, { stop2 }] = useSound("/door.wav", { volume: 0.7 });
-  const [cheer, { cheerStop }] = useSound("/cheer.mp3", { volume: 0.7 });
-  const { timer, tries, hint, winner } = useAppSelector((state) => state.App);
+  const [play2] = useSound("/door.wav", { volume: 0.7 });
   const dispatch = useAppDispatch();
+  const { Stop, Tony } = useGameSounds();
 
   //  ---------------------------------Functions and Effects
 
@@ -146,46 +141,6 @@ const GameBoard: React.FC<Props> = ({ level, stops }) => {
     setHints(hints - 1);
   }
 
-  React.useEffect(() => {
-    if (winner) {
-      const rewardBounty = 10000; // Set your reward amount here
-      const incrementRate = 100; // How much to increment by each interval
-      const interval = setInterval(() => {
-        setHunterMoney((prev) => {
-          if (prev + incrementRate >= rewardBounty) {
-            clearInterval(interval);
-            return rewardBounty;
-          }
-          // You can play a coin sound effect here as the money increases
-          return prev + incrementRate;
-        });
-      }, 55);
-      // Adjust this time to speed up or slow down the increment
-
-      if (!isPlaying && audio) {
-        audio.volume = 1;
-        audio
-          .play()
-          .catch((error) => console.error("Audio play failed:", error));
-        cheer();
-
-        setIsPlaying(true);
-        audio.addEventListener("ended", () => setIsPlaying(false));
-      }
-
-      return () => {
-        if (audio) {
-          audio.pause();
-          audio.currentTime = 0;
-        }
-        clearInterval(interval);
-      }; // Clear interval if component is unmounted
-    }
-  }, [winner]);
-  React.useEffect(() => {
-    setAudio(new Audio("coins.mp3"));
-  }, []);
-
   return (
     <motion.div
       initial={{ opacity: 0, x: -500 }}
@@ -194,24 +149,21 @@ const GameBoard: React.FC<Props> = ({ level, stops }) => {
         tries == 0 || winner ? "bg-[#2C2C54]" : "bg-white"
       }  h-full flex-wrap mb-3 w-full`}
     >
-      <div className='absolute top-4 right-4'>
-        <span className={`text-[#70F8BA] ${pop.className}`}>
-          💼: 💲{hunterMoney}
-        </span>
-      </div>
       <div className='absolute space-x-10 left-6 bottom-8'>
         <button
-          className={`px-6 active:scale-95 duration-200 hover:bg-[rgb(174,93,46)] hover:text-[rgb(248,255,213)] ${pop.className} py-2 rounded-md bg-[rgb(248,255,213)]`}
+          className={`px-6 active:scale-95 text-black duration-200 hover:bg-[rgb(174,93,46)] hover:text-[rgb(248,255,213)] ${pop.className} py-2 rounded-md bg-[rgb(248,255,213)]`}
           onClick={giveHint}
         >
           Hint
         </button>
         <button
-          className={`px-6 active:scale-95 duration-200 hover:bg-[rgb(174,93,46)] hover:text-[rgb(248,255,213)] ${pop.className} py-2 rounded-md bg-[rgb(248,255,213)]`}
+          className={`px-6 active:scale-95 text-black duration-200 hover:bg-[rgb(174,93,46)] hover:text-[rgb(248,255,213)] ${pop.className} py-2 rounded-md bg-[rgb(248,255,213)]`}
           onClick={() => {
             router.push("/");
-            stops();
-            play();
+            Stop();
+            Tony.stop();
+            Tony.play();
+            Tony.fade(0, 1, 5000);
           }}
         >
           Back
@@ -265,10 +217,10 @@ const GameBoard: React.FC<Props> = ({ level, stops }) => {
                     : ""
                 } bg-[#C89933] ${
                   tries == level * 4 ? "translate-y-[0%]" : ""
-                } z-20 relative duration-[3000ms] h-full border border-teal-950 flex justify-center items-center`}
+                } z-20 relative  duration-[3000ms] h-full border border-teal-950 flex justify-center items-center`}
               >
                 <button
-                  className='absolute right-2 top-[65%]'
+                  className='absolute right-2 mb-4 top-[45%]'
                   onClick={() => handleClick(x, y)}
                 >
                   🔘

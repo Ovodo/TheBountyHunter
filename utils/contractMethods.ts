@@ -9,6 +9,7 @@ import { BTY__factory } from "@/types/ethers-contracts/factories/BTY__factory";
 import { Provider } from "@/types/Provider";
 import { hexToDecimalBigNumber } from "./helperFunctions";
 import { MyERC721, MyERC721__factory } from "@/types/ethers-contracts";
+import usePassport from "@/hooks/usePassport";
 
 const CONTRACT_ADDRESS = "0xC567F9776545b4Cc8634d91E146E264712d96E49"; // The address of the deployed collection contract
 const CONTRACT_ADDRESS2 = "0x70a2E9284abec0Ed90F8Cd66C335b34eF28854b7"; // The address of the deployed collection contract
@@ -36,25 +37,8 @@ export async function getData() {
   }
 }
 
-export const signerAddress = async (provider: Provider): Promise<string> => {
-  const accounts = await provider.request({
-    method: "eth_requestAccounts",
-  });
-  const bal = await provider.request({
-    method: "eth_getBalance",
-    params: ["0xa5D847ec61Cb44F32Fc005a83453F0317c1241B6"],
-  });
-  const balance2 = hexToDecimalBigNumber(bal);
-  console.log("bal", balance2);
-  console.log(parseInt(balance2) / 10 ** 18);
-
-  return accounts[0];
-};
-
-export const transferTokens = async (provider: Provider) => {
-  // console.log(window, typeof window);
-  // window.open();
-
+export const getBalance = async (): Promise<number> => {
+  const { provider } = usePassport();
   await provider.request({
     method: "eth_requestAccounts",
   });
@@ -64,15 +48,34 @@ export const transferTokens = async (provider: Provider) => {
 
   // // Create a new instance of the contract
   const contract: BTY = BTY__factory.connect(ERC20_CONTRACT, signer);
-  const amountToSend = ethers.utils.parseUnits("1000", 18); // Again, assuming 18 decimals
-  console.log(amountToSend);
+  const balance = await contract.balanceOf(userAddress);
+  const balance2 = hexToDecimalBigNumber(balance._hex);
+  const ball = parseInt(balance2) / 10 ** 18;
+  console.log("Contract Bals", ball);
 
-  // const trans = await contract.withdrawTokens(userAddress, amountToSend);
-  // console.log("trans", trans);
-  // const balance = await contract.balanceOf(userAddress);
-  // const balance2 = hexToDecimalBigNumber(balance._hex);
-  // // console.log("bal", balance2);
-  // console.log(parseInt(balance2) / 10 ** 18);
+  return ball;
+};
+
+export const transferTokens = async (provider: Provider, amount: string) => {
+  await provider.request({
+    method: "eth_requestAccounts",
+  });
+  const providers = new ethers.providers.Web3Provider(provider);
+  const signer = providers.getSigner();
+  const userAddress = await signer.getAddress();
+
+  // // Create a new instance of the contract
+  const contract: BTY = BTY__factory.connect(ERC20_CONTRACT, signer);
+  const amountToSend = ethers.utils.parseUnits(amount, 18); // Again, assuming 18 decimals
+  try {
+    const trans = await contract.withdrawTokens(userAddress, amountToSend);
+    console.log("trans", trans);
+  } catch (error) {
+    alert("Try disabling Pop up blocker");
+  }
+  const balance = await contract.balanceOf(userAddress);
+  const balance2 = hexToDecimalBigNumber(balance._hex);
+  console.log(parseInt(balance2) / 10 ** 18);
 };
 
 export const mint = async (token_id: number, provider: Provider) => {

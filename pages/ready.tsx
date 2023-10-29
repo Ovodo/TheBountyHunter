@@ -5,39 +5,86 @@ import { motion } from "framer-motion";
 import Spin from "@/components/layout/Spin";
 import useSound from "use-sound";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { reset, setTimer } from "@/redux/features/gameSlice";
+import { reset, setLevel, setTimer, upLevel } from "@/redux/features/gameSlice";
 import NotificationEvent from "@/components/alert/NotificationEvent";
 import useFonts from "@/hooks/useFonts";
 import { useRouter } from "next/router";
+import useGameSounds from "@/hooks/useGameSounds";
+import { set } from "mongoose";
+import Mute from "@/components/alert/Mute";
 
 const pop = Poppins({ weight: "600", subsets: ["devanagari"] });
+const boss = [
+  { name: "Armadillo", level: 5, src: "/armadillo.jpg" },
+  { name: "Vulture", level: 4, src: "/vulture.jpg" },
+  { name: "Pedro", level: 3, src: "/pedro.jpg" },
+  { name: "Mask", level: 2, src: "/mask.jpg" },
+  { name: "Black", level: 1, src: "/roof.jpg" },
+];
 
 const Index = () => {
   const { timer, level } = useAppSelector((state) => state.App);
   const dispatch = useAppDispatch();
   const [timeup, setTimeup] = useState<boolean>(false);
-  const [play, { stop }] = useSound("/suspense.mp3", {
-    volume: 0.65,
-    interrupt: true,
-  });
+  const [selectedBossIndex, setSelectedBossIndex] = useState(
+    boss.length - level
+  );
   const [over] = useSound("/over.mp3", { volume: 0.65 });
-  const [begin] = useSound("/neat_beep.mp3", { volume: 0.65 });
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { Move, playBeep, Tony, Stop, Write, Suspense, Main } = useGameSounds();
 
   const { metal, poppins } = useFonts();
 
-  const boss = [
-    { name: "Armadillo", src: "/armadillo.jpg" },
-    { name: "Vulture", src: "/vulture.jpg" },
-    { name: "Pedro", src: "/pedro.jpg" },
-    { name: "Mask", src: "/mask.jpg" },
-    { name: "Black", src: "/roof.jpg" },
-  ];
+  // Find the index of the boss for the current level
+  const currentBossIndex = boss.findIndex((b) => b.level === level);
+
+  // Calculate translateY percentage based on the index
+  const translateYPercent = selectedBossIndex * (100 / boss.length) - 15;
+  // console.log(selectedBossIndex);
+
   function handleKeyDown(event: KeyboardEvent) {
     switch (event.key) {
+      case "ArrowUp":
+        if (
+          selectedBossIndex > 0 &&
+          boss[selectedBossIndex - 1].level <= level
+        ) {
+          setSelectedBossIndex((prevIndex) => {
+            console.log(prevIndex - 1);
+
+            return prevIndex - 1;
+          });
+          Move.play();
+        }
+        break;
+      case "ArrowDown":
+        if (selectedBossIndex < boss.length - 1) {
+          setSelectedBossIndex((prevIndex) => {
+            console.log(prevIndex + 1);
+
+            return prevIndex + 1;
+          });
+          Move.play();
+        }
+        break;
+
       case "Enter":
-        begin();
+        Stop();
+        playBeep();
+        setTimeout(() => {
+          Main.stop();
+          Main.play();
+          Main.fade(0, 1, 7000);
+        }, 3000);
+
+        setSelectedBossIndex((curr) => {
+          console.log(curr);
+
+          dispatch(setLevel(boss[curr].level));
+          return curr;
+        });
+
         router.push("/arena");
 
         break;
@@ -48,11 +95,38 @@ const Index = () => {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [begin]);
+  }, [selectedBossIndex]);
+  useEffect(() => {
+    Suspense.stop();
+    Suspense.play();
+    Suspense.fade(0, 1, 7000);
+    setTimeout(() => Write(), 500);
+
+    return () => {};
+  }, []);
+  useEffect(() => {
+    window.history.pushState(null, document.title, window.location.href);
+    window.onpopstate = function () {
+      window.history.go(1);
+    };
+  }, []);
 
   return (
     <Spin>
       <div className='relative justify-between h-screen p-5 [background:linear-gradient(180deg,rgba(0,0,0,0.8)_1.46%,rgba(13.63,20.14,12,0.72)_13.34%,rgba(50.7,74.92,44.64,0.5)_27.53%,rgba(91.64,135.43,80.69,0.26)_50.29%,rgba(135.88,200.81,119.65,0.04)_56.65%,rgba(103.44,163.01,88.54,0.21)_63.93%,rgba(48.61,99.14,35.98,0.56)_73.16%,rgba(22.79,69.06,11.22,0.72)_83.68%)]   flex flex-row  w-full'>
+        <Mute />
+        <button
+          className={`px-6 text-black  active:scale-95 absolute bottom-4 left-8 duration-200 hover:bg-[rgb(174,93,46)] hover:text-[rgb(248,255,213)] ${pop.className} py-2 rounded-md bg-[rgb(248,255,213)]`}
+          onClick={() => {
+            Stop();
+            router.push("/");
+            Tony.stop();
+            Tony.play();
+            Tony.fade(0, 1, 5000);
+          }}
+        >
+          Back
+        </button>
         <h3
           className={` text-3xl absolute left-[50%] -translate-x-1/2 tracking-wider  text-appCream ${metal.className}`}
         >
@@ -77,7 +151,7 @@ const Index = () => {
         >
           Press the Enter key to access the Arena
         </h3>
-        <div className='h-[85%] w-[40%] flex space-y-5 items-center justify-center flex-col'>
+        <div className='h-[85%] w-[40%] flex space-y-16 items-center justify-center flex-col'>
           {" "}
           <h2
             style={{
@@ -92,7 +166,7 @@ const Index = () => {
           <motion.img
             initial={{ rotate: 0 }}
             animate={{ rotate: 720 }}
-            className='w-[250px] h-[250px] rounded-full'
+            className={`w-[250px] h-[250px] animate-pulse  rounded-full`}
             src='/assets/images/jing-sun.jpg'
             alt='hunter'
           />
@@ -103,13 +177,13 @@ const Index = () => {
         <div className='h-[95%]  relative scrollbar-hide overflow-scroll w-[40%]'>
           <div className='fixed w-full bottom-[50px] h-[15px] z-20 opacity-10   [background:linear-gradient(360deg,rgba(0,0,0,0.8)_1.46%,rgba(13.63,20.14,12,0.72)_13.34%,rgba(50.7,74.92,44.64,0.5)_27.53%,rgba(91.64,135.43,80.69,0.26)_50.29%,rgba(135.88,200.81,119.65,0.04)_56.65%,rgba(103.44,163.01,88.54,0.21)_63.93%,rgba(48.61,99.14,35.98,0.56)_73.16%,rgba(22.79,69.06,11.22,0.72)_83.68%)] ' />
           <motion.div
-            className='absolute'
+            className='min-h-max '
             initial={{ translateY: "100%" }}
-            animate={{ translateY: "-65%" }}
+            animate={{ translateY: `-${translateYPercent}%` }} // Adjust translateY based on the boss's index using percentage
             transition={{
-              //   type: "spring",
-              //   stiffness: 50,
-              //   damping: 50,
+              type: "spring",
+              stiffness: 50,
+              damping: 50,
               duration: 8,
             }}
           >
@@ -117,13 +191,17 @@ const Index = () => {
               return (
                 <div
                   className={`flex  ${
-                    level !== boss.length - i ? "opacity-50" : "opacity-100"
+                    level !== boss.length - i ? "opacity-30" : "opacity-100"
+                  }  ${
+                    i === selectedBossIndex
+                      ? "border-2 p-2 border-appBrown opacity-90"
+                      : ""
                   } items-center mb-10 justify-around space-between w-full flex-row-reverse`}
                 >
                   <h2
                     className={`${metal.className} text-[36px] text-appBrown`}
                   >
-                    lv {boss.length - i}
+                    lv {item.level}
                   </h2>
                   <motion.img
                     initial={{ rotate: 0 }}
@@ -148,3 +226,5 @@ const Index = () => {
 };
 
 export default Index;
+
+export async function getServerSideProps() {}

@@ -30,6 +30,11 @@ body {
   scale: 1.2;
   background-color: rgb(174, 93, 46);
 }
+.selected {
+  border: 2px solid white;
+  box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.5);
+}
+
 /* This will hide the scrollbar for Chrome, Safari, etc. */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;

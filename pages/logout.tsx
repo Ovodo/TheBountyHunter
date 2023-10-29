@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import usePassport from "@/hooks/usePassport";
 import { useRouter } from "next/router";
 import Layout from "@/components/layout";
+import useGameSounds from "@/hooks/useGameSounds";
 
 const inter = Inter({ subsets: ["latin"] });
 const metal = Metal_Mania({ weight: "400", subsets: ["latin-ext"] });
@@ -28,26 +29,12 @@ export default function Index() {
   const menuItems = ["Start", "Options", "Shop", "Difficulty", "Hunter"];
   const route = ["/arena", "Options", "Shop", "Difficulty", "Hunter"];
   const router = useRouter();
+  const { playHome } = useGameSounds();
 
   const Login = async () => {
-    if (window !== undefined) {
-      // const { passports, provider } = usePassport();
-      // const accounts = await provider.request({
-      //   method: "eth_requestAccounts",
-      // });
-      // sessionStorage.setItem("address", accounts[0] as string);
-      // setAddress(sessionStorage.getItem("address"));
-      // console.log(accounts);
-    }
-    if (home) {
-      home.volume = 0.5;
-
-      home?.play();
-    }
+    playHome();
     router.push("/");
   };
-
-  console.log(user, address);
 
   function handleKeyDown(event: KeyboardEvent) {
     switch (event.key) {

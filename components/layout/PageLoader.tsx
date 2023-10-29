@@ -9,11 +9,6 @@ interface Props {
   loading: boolean;
 }
 
-const container = {
-  start: { opacity: 0 },
-  end: { opacity: 1 },
-};
-
 const dotVariants = {
   start: {
     x: -170,
