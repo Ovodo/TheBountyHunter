@@ -82,8 +82,8 @@ const Index = () => {
 
   useEffect(() => {
     fetchDetails();
-    // setIsLoading(false);
-  }, [isLoading]);
+     setIsLoading(false);
+  }, [isLoading,fetchDetails]);
   return (
     <div className='flex w-screen bg-gradient-radial to-slate-900 via-teal-200 from-slate-500 overflow-hidden relative  h-screen items-center justify-between'>
       <div>{isLoading && <NotificationEvent title='Loading...⏳ ' />}</div>
