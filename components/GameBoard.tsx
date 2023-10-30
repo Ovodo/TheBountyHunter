@@ -4,7 +4,6 @@ import { useState } from "react";
 import React from "react";
 import { Poppins } from "next/font/google";
 import { motion } from "framer-motion";
-import { set } from "mongoose";
 import { useRouter } from "next/router";
 import useSound from "use-sound";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
