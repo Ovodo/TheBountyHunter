@@ -56,88 +56,59 @@ const Index = () => {
   // Calculate translateY percentage based on the index
   const translateYPercent = selectedBossIndex * (100 / boss.length) - 15;
 
-  function handleKeyDown(event: KeyboardEvent) {
-    switch (event.key) {
-      case "ArrowUp":
-        setSelectedBossIndex((prevIndex) => {
-          if (
-            selectedBossIndex > 0 &&
-            boss[selectedBossIndex - 1].level <= level
-          ) {
-            Move.play();
-            console.log("upArr");
-            console.log(prevIndex - 1);
-            console.log("boss", boss.length - 1);
-            console.log("sell", selectedBossIndex);
-
-            return prevIndex - 1;
-          } else {
-            return prevIndex;
-          }
-        });
-        break;
-      case "ArrowDown":
-        setSelectedBossIndex((prevIndex) => {
-          if (selectedBossIndex < boss.length - 1) {
-            console.log("downArr");
-            Move.play();
-            console.log("prev", prevIndex + 1);
-            console.log("boss", boss.length - 1);
-            console.log("sell", selectedBossIndex);
-            return prevIndex + 1;
-          } else {
-            return prevIndex;
-          }
-        });
-        break;
-
-      case "Enter":
-        Stop();
-        playBeep();
-        setTimeout(() => {
-          Main.stop();
-          Main.play();
-          Main.fade(0, 1, 7000);
-        }, 3000);
-
-        setSelectedBossIndex((curr) => {
-          dispatch(setLevel(boss[curr]?.level));
-          return curr;
-        });
-        // if (level <= 5) {
-        router.push("/arena");
-        // } else {
-        // alert("Go back to mint and claim");
-        // }
-
-        break;
-    }
-  }
-
-  async function fetchDetails() {
-    try {
-      const response = await getDetails(
-        sessionStorage.getItem("address") as string
-      );
-      console.log(response);
-      setUserData(response.data);
-      dispatch(newUser(response.data));
-      dispatch(setLevel(response.data.level));
-
-      return response;
-    } catch (error) {
-      console.error("Error posting address:", error);
-    }
-  }
-
   useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      switch (event.key) {
+        case "ArrowUp":
+          setSelectedBossIndex((prevIndex) => {
+            if (prevIndex > 0 && boss[prevIndex - 1].level <= level) {
+              Move.play();
+              return prevIndex - 1;
+            } else {
+              return prevIndex;
+            }
+          });
+          break;
+        case "ArrowDown":
+          setSelectedBossIndex((prevIndex) => {
+            if (prevIndex < boss.length - 1) {
+              Move.play();
+              return prevIndex + 1;
+            } else {
+              return prevIndex;
+            }
+          });
+          break;
+
+        case "Enter":
+          Stop();
+          playBeep();
+          setTimeout(() => {
+            Main.stop();
+            Main.play();
+            Main.fade(0, 1, 7000);
+          }, 3000);
+
+          setSelectedBossIndex((curr) => {
+            dispatch(setLevel(boss[curr]?.level));
+            return curr;
+          });
+          // if (level <= 5) {
+          router.push("/arena");
+          // } else {
+          // alert("Go back to mint and claim");
+          // }
+
+          break;
+      }
+    }
+
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectedBossIndex]);
+  }, [Main, Move, Stop, dispatch, level, playBeep, router]);
   useEffect(() => {
-    setTimeout(() => Write(), 500);
     setTimeout(() => Write(), 500);
     Suspense.stop();
     Suspense.play();
@@ -146,13 +117,24 @@ const Index = () => {
     return () => {
       Stop();
     };
-    return () => {
-      Stop();
-    };
-  }, []);
+  }, [Stop, Suspense, Write]);
 
   useEffect(() => {
-    fetchDetails();
+    async function fetchDetails() {
+      try {
+        const response = await getDetails(
+          sessionStorage.getItem("address") as string
+        );
+        console.log(response);
+        setUserData(response.data);
+        dispatch(newUser(response.data));
+        dispatch(setLevel(response.data.level));
+
+        return response;
+      } catch (error) {
+        console.error("Error posting address:", error);
+      }
+    }
     fetchDetails();
   }, []);
   useEffect(() => {
@@ -249,6 +231,7 @@ const Index = () => {
             {boss.map((item, i) => {
               return (
                 <div
+                  key={item.level.toString()}
                   className={`flex  ${
                     level <= boss.length - i ? "opacity-30" : "opacity-100"
                   }  ${

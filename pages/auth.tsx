@@ -12,7 +12,7 @@ const Index = () => {
     router.push("/");
 
     return () => {};
-  }, [router]);
+  }, [router,passports]);
 
   return <PageLoader loading={true} />;
 };

@@ -66,39 +66,6 @@ export default function Home() {
     await passports.logout();
   };
 
-  function handleKeyDown(event: KeyboardEvent) {
-    switch (event.key) {
-      case "ArrowUp":
-        setSelectedMenuIndex((prev) => {
-          if (prev - 1 < 0) {
-            return 0;
-          } else {
-            Move.play();
-            return prev - 1;
-          }
-        });
-        break;
-      case "ArrowDown":
-        setSelectedMenuIndex((prev) => {
-          if (prev + 1 >= menuItems.length) {
-            return menuItems.length - 1;
-          } else {
-            Move.play();
-            return prev + 1;
-          }
-        });
-        break;
-      case "Enter":
-        Stop();
-        Crash.play();
-        setSelectedMenuIndex((currentSelectedIndex) => {
-          handleMenuAction(currentSelectedIndex);
-          return currentSelectedIndex;
-        });
-        break;
-    }
-  }
-
   function handleMenuAction(x: number) {
     let routeToNavigate = menuItems[x].toLowerCase();
     if (routeToNavigate === "start") {
@@ -111,6 +78,38 @@ export default function Home() {
     // playSus();
   }
   useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      switch (event.key) {
+        case "ArrowUp":
+          setSelectedMenuIndex((prev) => {
+            if (prev - 1 < 0) {
+              return 0;
+            } else {
+              Move.play();
+              return prev - 1;
+            }
+          });
+          break;
+        case "ArrowDown":
+          setSelectedMenuIndex((prev) => {
+            if (prev + 1 >= menuItems.length) {
+              return menuItems.length - 1;
+            } else {
+              Move.play();
+              return prev + 1;
+            }
+          });
+          break;
+        case "Enter":
+          Stop();
+          Crash.play();
+          setSelectedMenuIndex((currentSelectedIndex) => {
+            handleMenuAction(currentSelectedIndex);
+            return currentSelectedIndex;
+          });
+          break;
+      }
+    }
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
