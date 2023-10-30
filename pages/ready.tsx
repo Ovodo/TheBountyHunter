@@ -56,7 +56,12 @@ const Index = () => {
   // Calculate translateY percentage based on the index
   const translateYPercent = selectedBossIndex * (100 / boss.length) - 15;
 
-  function handleKeyDown(event: KeyboardEvent) {
+  
+  
+
+  useEffect(() => {
+
+function handleKeyDown(event: KeyboardEvent) {
     switch (event.key) {
       case "ArrowUp":
         setSelectedBossIndex((prevIndex) => {
@@ -114,23 +119,6 @@ const Index = () => {
     }
   }
 
-  async function fetchDetails() {
-    try {
-      const response = await getDetails(
-        sessionStorage.getItem("address") as string
-      );
-      console.log(response);
-      setUserData(response.data);
-      dispatch(newUser(response.data));
-      dispatch(setLevel(response.data.level));
-
-      return response;
-    } catch (error) {
-      console.error("Error posting address:", error);
-    }
-  }
-
-  useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
@@ -149,6 +137,23 @@ const Index = () => {
   }, [Stop, Suspense,Write]);
 
   useEffect(() => {
+
+
+async function fetchDetails() {
+    try {
+      const response = await getDetails(
+        sessionStorage.getItem("address") as string
+      );
+      console.log(response);
+      setUserData(response.data);
+      dispatch(newUser(response.data));
+      dispatch(setLevel(response.data.level));
+
+      return response;
+    } catch (error) {
+      console.error("Error posting address:", error);
+    }
+  }
     fetchDetails();
    
   }, [fetchDetails]);
