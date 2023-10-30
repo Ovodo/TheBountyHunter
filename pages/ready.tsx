@@ -12,6 +12,8 @@ import { useRouter } from "next/router";
 import useGameSounds from "@/hooks/useGameSounds";
 import { set } from "mongoose";
 import Mute from "@/components/alert/Mute";
+import { baseUrl, getDetails } from "@/utils/databaseMethods";
+import { UserState, newUser } from "@/redux/features/userSlice";
 
 const pop = Poppins({ weight: "600", subsets: ["devanagari"] });
 const boss = [
@@ -23,50 +25,69 @@ const boss = [
 ];
 
 const Index = () => {
-  const { timer, level } = useAppSelector((state) => state.App);
+  const { level } = useAppSelector((state) => state.User);
   const dispatch = useAppDispatch();
-  const [timeup, setTimeup] = useState<boolean>(false);
-  const [selectedBossIndex, setSelectedBossIndex] = useState(
-    boss.length - level
-  );
-  const [over] = useSound("/over.mp3", { volume: 0.65 });
+  const [selectedBossIndex, setSelectedBossIndex] = useState<number>(4);
   const [isLoading, setIsLoading] = useState(false);
+  const [userData, setUserData] = useState<UserState>();
   const router = useRouter();
   const { Move, playBeep, Tony, Stop, Write, Suspense, Main } = useGameSounds();
+  // console.log("selected", selectedBossIndex, level, boss.length);
 
   const { metal, poppins } = useFonts();
-
-  // Find the index of the boss for the current level
-  const currentBossIndex = boss.findIndex((b) => b.level === level);
+  const readyPhrase = () => {
+    switch (level) {
+      case 1:
+        return " Black was last seen on the roof tops, catch him and bring him in for a whooping sum of 💰 💲1000";
+      case 2:
+        return " Mask is a tricky fellow , bring him to the cops and recieve  💰 💲5000";
+      case 3:
+        return "Pedro is known to hide between nukes and crannies, but the prize of 💰 💲20000 is worth the catch";
+      case 4:
+        return "Vulture is known to eat his preys, going for 💰 💲50000 ";
+      case 5:
+        return "Armadillo the legend, going for 💰 💲100000 ";
+      default:
+        return "Congratulations 🎉.. go back to claim your BTY tokens and mint your NFT badge for a successful mission";
+    }
+  };
 
   // Calculate translateY percentage based on the index
   const translateYPercent = selectedBossIndex * (100 / boss.length) - 15;
-  // console.log(selectedBossIndex);
 
   function handleKeyDown(event: KeyboardEvent) {
     switch (event.key) {
       case "ArrowUp":
-        if (
-          selectedBossIndex > 0 &&
-          boss[selectedBossIndex - 1].level <= level
-        ) {
-          setSelectedBossIndex((prevIndex) => {
+        setSelectedBossIndex((prevIndex) => {
+          if (
+            selectedBossIndex > 0 &&
+            boss[selectedBossIndex - 1].level <= level
+          ) {
+            Move.play();
+            console.log("upArr");
             console.log(prevIndex - 1);
+            console.log("boss", boss.length - 1);
+            console.log("sell", selectedBossIndex);
 
             return prevIndex - 1;
-          });
-          Move.play();
-        }
+          } else {
+            return prevIndex;
+          }
+        });
         break;
       case "ArrowDown":
-        if (selectedBossIndex < boss.length - 1) {
-          setSelectedBossIndex((prevIndex) => {
-            console.log(prevIndex + 1);
-
+        setSelectedBossIndex((prevIndex) => {
+          if (selectedBossIndex < boss.length - 1) {
+            console.log("downArr");
+            Move.play();
+            console.log("prev", prevIndex + 1);
+            console.log("boss", boss.length - 1);
+            console.log("sell", selectedBossIndex);
             return prevIndex + 1;
-          });
-          Move.play();
-        }
+          } else {
+            return prevIndex;
+          }
+        });
         break;
 
       case "Enter":
@@ -79,15 +100,32 @@ const Index = () => {
         }, 3000);
 
         setSelectedBossIndex((curr) => {
-          console.log(curr);
-
-          dispatch(setLevel(boss[curr].level));
+          dispatch(setLevel(boss[curr]?.level));
           return curr;
         });
-
+        // if (level <= 5) {
         router.push("/arena");
+        // } else {
+        // alert("Go back to mint and claim");
+        // }
 
         break;
+    }
+  }
+
+  async function fetchDetails() {
+    try {
+      const response = await getDetails(
+        sessionStorage.getItem("address") as string
+      );
+      console.log(response);
+      setUserData(response.data);
+      dispatch(newUser(response.data));
+      dispatch(setLevel(response.data.level));
+
+      return response;
+    } catch (error) {
+      console.error("Error posting address:", error);
     }
   }
   useEffect(() => {
@@ -97,19 +135,24 @@ const Index = () => {
     };
   }, [selectedBossIndex]);
   useEffect(() => {
+    setTimeout(() => Write(), 500);
     Suspense.stop();
     Suspense.play();
     Suspense.fade(0, 1, 7000);
-    setTimeout(() => Write(), 500);
 
-    return () => {};
-  }, []);
-  useEffect(() => {
-    window.history.pushState(null, document.title, window.location.href);
-    window.onpopstate = function () {
-      window.history.go(1);
+    return () => {
+      Stop();
     };
   }, []);
+
+  useEffect(() => {
+    fetchDetails();
+  }, []);
+  useEffect(() => {
+    if (level) {
+      setSelectedBossIndex(boss.length - level);
+    }
+  }, [level]);
 
   return (
     <Spin>
@@ -141,8 +184,7 @@ const Index = () => {
               animate={{ width: "100%" }}
               transition={{ duration: 10, ease: "linear" }}
             >
-              Black was last seen on the roof tops, catch him and bring him in
-              for a whooping sum of 💰 💲10,0000
+              {readyPhrase()}
             </motion.span>
           </div>
         </div>
@@ -174,10 +216,10 @@ const Index = () => {
             Jing-Sun
           </h2>
         </div>
-        <div className='h-[95%]  relative scrollbar-hide overflow-scroll w-[40%]'>
+        <div className='h-[95%]  relative scrollbar-hid overflow-scroll w-[40%]'>
           <div className='fixed w-full bottom-[50px] h-[15px] z-20 opacity-10   [background:linear-gradient(360deg,rgba(0,0,0,0.8)_1.46%,rgba(13.63,20.14,12,0.72)_13.34%,rgba(50.7,74.92,44.64,0.5)_27.53%,rgba(91.64,135.43,80.69,0.26)_50.29%,rgba(135.88,200.81,119.65,0.04)_56.65%,rgba(103.44,163.01,88.54,0.21)_63.93%,rgba(48.61,99.14,35.98,0.56)_73.16%,rgba(22.79,69.06,11.22,0.72)_83.68%)] ' />
           <motion.div
-            className='min-h-max '
+            className='max-h-max relative pt-[200px]'
             initial={{ translateY: "100%" }}
             animate={{ translateY: `-${translateYPercent}%` }} // Adjust translateY based on the boss's index using percentage
             transition={{
@@ -191,10 +233,10 @@ const Index = () => {
               return (
                 <div
                   className={`flex  ${
-                    level !== boss.length - i ? "opacity-30" : "opacity-100"
+                    level <= boss.length - i ? "opacity-30" : "opacity-100"
                   }  ${
-                    i === selectedBossIndex
-                      ? "border-2 p-2 border-appBrown opacity-90"
+                    selectedBossIndex === i
+                      ? "border-4 border-appBrown p-2 opacity-90"
                       : ""
                   } items-center mb-10 justify-around space-between w-full flex-row-reverse`}
                 >
@@ -226,5 +268,3 @@ const Index = () => {
 };
 
 export default Index;
-
-export async function getServerSideProps() {}

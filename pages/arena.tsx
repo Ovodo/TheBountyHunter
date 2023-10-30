@@ -19,19 +19,21 @@ import Mute from "@/components/alert/Mute";
 import usePassport from "@/hooks/usePassport";
 import { getBalance, transferTokens } from "@/utils/contractMethods";
 import { useRouter } from "next/router";
+import { levelUp } from "@/utils/databaseMethods";
 
 const pop = Poppins({ weight: "600", subsets: ["devanagari"] });
 
 const Arena = () => {
   // Timer logic
   const { timer, winner, tries, level } = useAppSelector((state) => state.App);
+  const { User } = useAppSelector((state) => state);
   const dispatch = useAppDispatch();
   const [timeup, setTimeup] = useState<boolean>(false);
   const [time, setTime] = useState<number>(timer);
-  const [hunterMoney, setHunterMoney] = useState<number>(0);
+  const [hunterMoney, setHunterMoney] = useState<number>(User.Rewards);
   const [bty, setBty] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
-  const { Main, Stop } = useGameSounds();
+  const { Main, Stop, Tony } = useGameSounds();
   const [over] = useSound("/over.mp3", { volume: 0.65 });
   const [cheer] = useSound("/cheer.mp3", { volume: 0.7 });
   const [coins] = useSound("/coins.mp3", { volume: 0.7 });
@@ -41,7 +43,7 @@ const Arena = () => {
     setIsLoading(true);
     setTimeup(false); // set timup to true
     setTimeout(() => {
-      dispatch(reset());
+      // dispatch(reset());
       setIsLoading(false);
     }, 300);
     dispatch(setWinner(false));
@@ -55,35 +57,36 @@ const Arena = () => {
     formattedTime = timer.toString();
     setTime(timer);
   };
+  const nextLvl = () => {
+    setIsLoading(true);
+    setTimeup(false); // set timup to true
+    setTimeout(() => {
+      // dispatch(reset());
+      setIsLoading(false);
+    }, 2000);
+    dispatch(setWinner(false));
+    router.push("/ready");
 
-  const Claim = async () => {
-    const { provider } = usePassport();
-
-    await transferTokens(provider, hunterMoney.toString());
-    const incrementRate = 10; // How much to increment by each interval
-    const interval = setInterval(() => {
-      setHunterMoney((prev) => {
-        if (prev - incrementRate <= 0) {
-          clearInterval(interval);
-          return prev - incrementRate ?? 0;
-        }
-        // You can play a coin sound effect here as the money increases
-        return prev - incrementRate;
-      });
-    }, 55);
-    const b = await getBalance();
-
-    const interval2 = setInterval(() => {
-      setBty((prev) => {
-        if (prev + incrementRate >= b) {
-          clearInterval(interval2);
-          return b;
-        }
-        // You can play a coin sound effect here as the money increases
-        return prev + incrementRate;
-      });
-    }, 55);
+    Stop();
   };
+
+  async function advanceLvl() {
+    if (User.level > level) {
+      console.log("Already passed this level");
+
+      return;
+    }
+    try {
+      const response = await levelUp(
+        sessionStorage.getItem("address") as string
+      );
+      console.log(response);
+
+      return response;
+    } catch (error) {
+      console.error("Error advancing level:", error);
+    }
+  }
 
   useEffect(() => {
     if (time <= 0) {
@@ -106,40 +109,53 @@ const Arena = () => {
     .toString()
     .padStart(2, "0")}:${(time % 60).toString().padStart(2, "0")}`;
 
-  let rewardBounty: number;
+  let rewardBounty: number = 0;
+  let incrementRate: number;
 
   useEffect(() => {
     if (winner) {
       switch (level) {
         case 1:
           rewardBounty = 1000; // Set your reward amount here
+          incrementRate = 10;
           break;
 
         case 2:
           rewardBounty = 5000; // Set your reward amount here
+          incrementRate = 50;
+          break;
+        case 3:
+          rewardBounty = 20000; // Set your reward amount here
+          incrementRate = 200;
+          break;
+        case 4:
+          rewardBounty = 50000; // Set your reward amount here
+          incrementRate = 500;
+          break;
+        case 5:
+          rewardBounty = 100000; // Set your reward amount here
+          incrementRate = 100;
           break;
 
         default:
           0;
           break;
       }
-      const incrementRate = 10; // How much to increment by each interval
       const interval = setInterval(() => {
         setHunterMoney((prev) => {
-          if (prev + incrementRate >= rewardBounty) {
+          if (prev + incrementRate >= rewardBounty + User.Rewards) {
             clearInterval(interval);
-            return rewardBounty;
+            return rewardBounty + User.Rewards;
           }
           // You can play a coin sound effect here as the money increases
           return prev + incrementRate;
         });
       }, 55);
-      // Adjust this time to speed up or slow down the increment
-
       coins();
       cheer();
 
-      dispatch(upLevel());
+      // dispatch(upLevel());
+      advanceLvl();
     }
 
     if ((timeup && !winner) || tries == 0) {
@@ -150,7 +166,7 @@ const Arena = () => {
       }, 6000);
     }
   }, [timeup, tries, winner]);
-  React.useEffect(() => {}, [winner]);
+  // React.useEffect(() => {}, [winner]);
 
   return (
     <Spin>
@@ -164,6 +180,26 @@ const Arena = () => {
           </span>
         </div>
         <Mute />
+        <div className='absolute space-x-10 left-6 bottom-8'>
+          {/* <button
+            className={`px-6 active:scale-95 text-black duration-200 hover:bg-[rgb(174,93,46)] hover:text-[rgb(248,255,213)] ${pop.className} py-2 rounded-md bg-[rgb(248,255,213)]`}
+            // onClick={giveHint}
+          >
+            Hint
+          </button> */}
+          <button
+            className={`px-6 active:scale-95 text-black duration-200 hover:bg-[rgb(174,93,46)] hover:text-[rgb(248,255,213)] ${pop.className} py-2 rounded-md bg-[rgb(248,255,213)]`}
+            onClick={() => {
+              router.push("/");
+              Stop();
+              Tony.stop();
+              Tony.play();
+              Tony.fade(0, 1, 5000);
+            }}
+          >
+            Back
+          </button>
+        </div>
         <div
           className={`text-center text-[#C89933] text-2xl font-bold mb-4 mt-auto ${pop.className}`}
         >
@@ -198,7 +234,8 @@ const Arena = () => {
                 animate={{ scale: 0.75, rotate: 720 * 2 }}
               >
                 <p className='animate-bounce flex flex-col space-y-4 text-center text-2xl text-[#2c2c54]'>
-                  Congratulations. You caught the Pirate. 🏆 <span>💲1000</span>
+                  Congratulations. You caught the Pirate. 🏆{" "}
+                  <span>💲{rewardBounty}</span>
                   💰
                 </p>
                 {/* <button
@@ -217,7 +254,7 @@ const Arena = () => {
             if (!winner) {
               restartGame();
             } else {
-              router.push("/ready");
+              nextLvl();
             }
           }}
           className={`px-6 text-black absolute hover:text-lg right-12 bottom-8 active:scale-95 duration-200 hover:bg-[rgb(174,93,46)] hover:text-[rgb(248,255,213)] ${pop.className} py-2 rounded-md bg-[rgb(248,255,213)]`}

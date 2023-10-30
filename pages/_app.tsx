@@ -36,6 +36,7 @@ export default function App({ Component, pageProps }: AppProps) {
     // Clean up - remove the event listener when the component is unmounted
     return () => {};
   }, []);
+
   return loading ? (
     <PageLoader loading={loading} />
   ) : (

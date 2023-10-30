@@ -1,9 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
 import appReducer from "./features/gameSlice";
-import soundReducer from "./features/soundSlice";
+import userReducer from "./features/userSlice";
 
 export const store = configureStore({
-  reducer: { App: appReducer, Sound: soundReducer },
+  reducer: { App: appReducer, User: userReducer },
   devTools: process.env.NODE_ENV !== "production",
 });
 

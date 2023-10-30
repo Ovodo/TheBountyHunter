@@ -22,13 +22,14 @@ const metal = Metal_Mania({ weight: "400", subsets: ["latin-ext"] });
 const poppins = Poppins({ weight: "500", subsets: ["devanagari"] });
 const menuItems = [
   "Start",
-  "Options",
-  "Shop",
-  "Difficulty",
-  "Hunter",
+  // "Options",
+  // "Shop",
+  // "Difficulty",
+  "Rewards",
   "Instructions",
   "Leave",
 ];
+const disable = "Options" || "Shop";
 
 export default function Home() {
   const [user, setUser] = React.useState<string | null>(null);
@@ -121,12 +122,6 @@ export default function Home() {
     };
   }, [selectedMenuIndex]);
 
-  // useEffect(() => {
-  //   window.history.pushState(null, document.title, window.location.href);
-  //   window.onpopstate = function () {
-  //     window.history.go(1);
-  //   };
-  // }, []);
   useEffect(() => {
     setUser(sessionStorage.getItem("name"));
     setAddress(sessionStorage.getItem("address"));
@@ -155,12 +150,14 @@ export default function Home() {
               backgroundImage:
                 "linear-gradient(180deg, rgb(248,255,213) 86.3%, rgb(174,93,46) 58.56%, rgb(255,236,170) 76.24%, rgb(239,255,213) 100%)",
             }}
-            className={`animate-bounce ${metal.className} w-[300px] bg-clip-text [-webkit-text-fill-color:transparent] [text-fill-color:transparent] text-transparent text-[20px]  tracking-[0] leading-[normal]`}
+            className={`animate-bounce ${address !== null ? "hidden" : ""} ${
+              metal.className
+            } w-[300px] bg-clip-text [-webkit-text-fill-color:transparent] [text-fill-color:transparent] text-transparent text-[20px]  tracking-[0] leading-[normal]`}
           >
             Connect your passport to begin
           </p>
           <button
-            // disabled={address ? true : false}
+            disabled={address ? true : false}
             onClick={Login}
             className={`px-6 ${user} text-black disabled:text-[rgb(174,93,46)] disabled:opacity-50 disabled:scale-100 disabled:bg-[rgb(248,255,233)] disabled:text-base   hover:scale-110  active:scale-95 duration-200 hover:bg-[rgb(174,93,46)] hover:text-[rgb(248,255,213)] ${metal.className} py-2 rounded-md bg-[rgb(248,255,213)]`}
           >
@@ -182,6 +179,7 @@ export default function Home() {
         >
           {menuItems.map((item, index) => (
             <button
+              // disabled={item == }
               key={index.toString()}
               onMouseEnter={() => {
                 setSelectedMenuIndex(index);

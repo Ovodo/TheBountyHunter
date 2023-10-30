@@ -9,8 +9,8 @@ type GameState = {
 };
 
 const initialState = {
-  level: 4,
-  tries: 4,
+  level: 1,
+  tries: 5,
   hint: 0,
   timer: 30,
   winner: false,
@@ -23,11 +23,45 @@ export const counter = createSlice({
     reset: () => initialState,
     upLevel: (state) => {
       state.level += 1;
-      state.tries = state.level * 4;
+      state.tries = state.level * 5;
+      switch (state.level) {
+        case 2:
+          state.timer = 45;
+          break;
+        case 3:
+          state.timer = 60;
+          break;
+        case 4:
+          state.timer = 75;
+          break;
+        case 5:
+          state.timer = 90;
+          break;
+        default:
+          state.timer = 30;
+          break;
+      }
     },
     setLevel: (state, action: PayloadAction<number>) => {
       state.level = action.payload;
-      state.tries = state.level * 4;
+      state.tries = state.level * 5;
+      switch (state.level) {
+        case 2:
+          state.timer = 45;
+          break;
+        case 3:
+          state.timer = 60;
+          break;
+        case 4:
+          state.timer = 75;
+          break;
+        case 5:
+          state.timer = 90;
+          break;
+        default:
+          state.timer = 30;
+          break;
+      }
     },
     upHint: (state) => {
       state.hint += 1;
