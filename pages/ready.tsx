@@ -128,6 +128,7 @@ const Index = () => {
       console.error("Error posting address:", error);
     }
   }
+
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
     return () => {
@@ -136,6 +137,7 @@ const Index = () => {
   }, [selectedBossIndex]);
   useEffect(() => {
     setTimeout(() => Write(), 500);
+    setTimeout(() => Write(), 500);
     Suspense.stop();
     Suspense.play();
     Suspense.fade(0, 1, 7000);
@@ -143,11 +145,20 @@ const Index = () => {
     return () => {
       Stop();
     };
+    return () => {
+      Stop();
+    };
   }, []);
 
   useEffect(() => {
     fetchDetails();
+    fetchDetails();
   }, []);
+  useEffect(() => {
+    if (level) {
+      setSelectedBossIndex(boss.length - level);
+    }
+  }, [level]);
   useEffect(() => {
     if (level) {
       setSelectedBossIndex(boss.length - level);
