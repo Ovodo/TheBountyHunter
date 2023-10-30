@@ -1,4 +1,4 @@
-// `use Client`;
+`use Client`;
 import React, { useCallback, useEffect, useState } from "react";
 import usePassport from "@/hooks/usePassport";
 import { useRouter } from "next/router";
@@ -163,10 +163,10 @@ export default function Home() {
             {user ? user : ""}
           </p>
         </div>
-        <div className='w-[57%] h-full'>
+        <div className='w-[57%]  h-full'>
           <Image
             fill
-            className='cover -z-[5] absolute'
+            className='object-scale-down -z-[5] absolute'
             src='/assets/images/hunter-1.png'
             alt='main- image'
           />

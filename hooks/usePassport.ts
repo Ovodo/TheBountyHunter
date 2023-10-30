@@ -1,3 +1,5 @@
+"use client";
+
 import { passport } from "@imtbl/sdk";
 import { baseConfig } from "../passport.config";
 

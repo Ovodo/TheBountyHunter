@@ -5,8 +5,9 @@ import { Router, useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import PageLoader from "@/components/layout/PageLoader";
 import { Providers } from "@/redux/provider";
+import dynamic from "next/dynamic";
 
-export default function App({ Component, pageProps }: AppProps) {
+function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   useEffect(() => {
@@ -46,3 +47,7 @@ export default function App({ Component, pageProps }: AppProps) {
     </Providers>
   );
 }
+
+export default dynamic(() => Promise.resolve(App), {
+  ssr: false,
+});

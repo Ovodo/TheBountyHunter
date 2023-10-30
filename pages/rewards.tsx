@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import useFonts from "@/hooks/useFonts";
@@ -160,9 +162,9 @@ const Index = () => {
           <motion.div
             initial={{ rotate: 0 }}
             animate={{ rotate: 720 }}
-            className={`w-[250px] h-[250px] bg-slate-500 rounded-full`}
+            className={`w-[250px] h-[250px] items-center justify-center flex bg-slate-500 rounded-full`}
           >
-            <Image fill src={Nft} alt='hunter' />
+            {Nft && <Image fill src={Nft} alt='Nft' />}
           </motion.div>
           <h1
             className={`${metal.className} text-appCream text-[100px] absolute`}
