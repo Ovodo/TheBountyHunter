@@ -135,9 +135,8 @@ const Index = () => {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectedBossIndex]);
+  }, [handleKeyDown]);
   useEffect(() => {
-    setTimeout(() => Write(), 500);
     setTimeout(() => Write(), 500);
     Suspense.stop();
     Suspense.play();
@@ -146,15 +145,13 @@ const Index = () => {
     return () => {
       Stop();
     };
-    return () => {
-      Stop();
-    };
-  }, []);
+   
+  }, [Stop, Suspense,Write]);
 
   useEffect(() => {
     fetchDetails();
-    fetchDetails();
-  }, []);
+   
+  }, [fetchDetails]);
   useEffect(() => {
     if (level) {
       setSelectedBossIndex(boss.length - level);
@@ -249,6 +246,7 @@ const Index = () => {
             {boss.map((item, i) => {
               return (
                 <div
+key = {item.level.toString()}
                   className={`flex  ${
                     level <= boss.length - i ? "opacity-30" : "opacity-100"
                   }  ${
