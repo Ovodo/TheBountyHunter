@@ -66,6 +66,22 @@ export default function Home() {
     await passports.logout();
   };
 
+
+  function handleMenuAction(x: number) {
+    let routeToNavigate = menuItems[x].toLowerCase();
+    if (routeToNavigate === "start") {
+      routeToNavigate = "/ready";
+    } else if (routeToNavigate === "leave") {
+      Logout();
+      routeToNavigate = "/logout";
+    }
+    router.push(routeToNavigate);
+    // playSus();
+  }
+  useEffect(() => {
+
+
+
   function handleKeyDown(event: KeyboardEvent) {
     switch (event.key) {
       case "ArrowUp":
@@ -98,19 +114,6 @@ export default function Home() {
         break;
     }
   }
-
-  function handleMenuAction(x: number) {
-    let routeToNavigate = menuItems[x].toLowerCase();
-    if (routeToNavigate === "start") {
-      routeToNavigate = "/ready";
-    } else if (routeToNavigate === "leave") {
-      Logout();
-      routeToNavigate = "/logout";
-    }
-    router.push(routeToNavigate);
-    // playSus();
-  }
-  useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
