@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 
 import React from "react";
 
-const auth = () => {
+const Index = () => {
   const router = useRouter();
   React.useEffect(() => {
     let { passports } = usePassport();
@@ -17,4 +17,4 @@ const auth = () => {
   return <PageLoader loading={true} />;
 };
 
-export default auth;
+export default Index;

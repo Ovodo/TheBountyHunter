@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import useGameSounds from "../hooks/useGameSounds";
 const poppins = Poppins({ weight: "500", subsets: ["devanagari"] });
 
-const instructions = () => {
+const Index = () => {
   const { Tony, Stop } = useGameSounds();
   const router = useRouter();
   return (
@@ -43,4 +43,4 @@ const instructions = () => {
   );
 };
 
-export default instructions;
+export default Index;

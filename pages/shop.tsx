@@ -6,7 +6,7 @@ import React from "react";
 
 const { metal, poppins } = useFonts();
 
-const shop = () => {
+const Index = () => {
   const { Tony, Stop } = useGameSounds();
   const router = useRouter();
   return (
@@ -32,4 +32,4 @@ const shop = () => {
   );
 };
 
-export default shop;
+export default Index;

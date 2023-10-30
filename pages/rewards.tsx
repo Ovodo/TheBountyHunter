@@ -16,7 +16,7 @@ import NotificationEvent from "@/components/alert/NotificationEvent";
 
 const { metal, poppins } = useFonts();
 
-const rewards = () => {
+const Index = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { level, Rewards, address, Nft } = useAppSelector(
@@ -180,4 +180,4 @@ const rewards = () => {
   );
 };
 
-export default rewards;
+export default Index;

@@ -6,7 +6,7 @@ import React from "react";
 
 const { metal, poppins } = useFonts();
 
-const hunter = () => {
+const Index = () => {
   const { Tony, Stop } = useGameSounds();
   const router = useRouter();
   return (
@@ -32,4 +32,4 @@ const hunter = () => {
   );
 };
 
-export default hunter;
+export default Index;
