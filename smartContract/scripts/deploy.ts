@@ -36,21 +36,20 @@ async function deploy() {
     deployer.address, // royalty recipient
     ethers.BigNumber.from("2000") // fee numerator
   );
-  await contract.deployed();
 
   // log deployed contract address
+  await contract.deployed();
   console.log(`MyERC721 contract deployed to ${contract.address}`);
 
-  // //deploy In game currencies contract
-  // const factory2: ERC20__factory = await ethers.getContractFactory("BTY");
-  // const contract2: ERC20 = await factory2
-  //   .connect(deployer)
-  //   .deploy("Bounty", "BTY");
-
-  // await contract2.deployed();
-  // console.log(`Bounty contract deployed to ${contract2.address}`);
+  //deploy In game currencies contract
+  const factory2: ERC20__factory = await ethers.getContractFactory("BTY");
+  const contract2: ERC20 = await factory2
+    .connect(deployer)
+    .deploy("Bounty", "BTY");
 
   // log deployed contract2 address
+  await contract2.deployed();
+  console.log(`Bounty contract deployed to ${contract2.address}`);
 }
 
 deploy().catch((error) => {

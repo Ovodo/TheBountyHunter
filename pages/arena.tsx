@@ -1,5 +1,3 @@
-`use client`;
-
 import GameBoard from "@/components/GameBoard";
 import React, { useState, useEffect } from "react";
 import { Poppins } from "next/font/google";
@@ -7,17 +5,10 @@ import { motion } from "framer-motion";
 import Spin from "@/components/layout/Spin";
 import useSound from "use-sound";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import {
-  reset,
-  setTimer,
-  setWinner,
-  upLevel,
-} from "@/redux/features/gameSlice";
+import { setWinner } from "@/redux/features/gameSlice";
 import NotificationEvent from "@/components/alert/NotificationEvent";
 import useGameSounds from "@/hooks/useGameSounds";
 import Mute from "@/components/alert/Mute";
-import usePassport from "@/hooks/usePassport";
-import { getBalance, transferTokens } from "@/utils/contractMethods";
 import { useRouter } from "next/router";
 import { levelUp } from "@/utils/databaseMethods";
 

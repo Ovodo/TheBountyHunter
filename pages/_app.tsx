@@ -5,7 +5,6 @@ import { Router, useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import PageLoader from "@/components/layout/PageLoader";
 import { Providers } from "@/redux/provider";
-import { GameSoundsProvider } from "@/hooks/GameContext";
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();

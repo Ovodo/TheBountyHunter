@@ -1,18 +1,14 @@
-import GameBoard from "@/components/GameBoard";
 import React, { useState, useEffect } from "react";
 import { Poppins } from "next/font/google";
 import { motion } from "framer-motion";
 import Spin from "@/components/layout/Spin";
-import useSound from "use-sound";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { reset, setLevel, setTimer, upLevel } from "@/redux/features/gameSlice";
-import NotificationEvent from "@/components/alert/NotificationEvent";
+import { setLevel } from "@/redux/features/gameSlice";
 import useFonts from "@/hooks/useFonts";
 import { useRouter } from "next/router";
 import useGameSounds from "@/hooks/useGameSounds";
-import { set } from "mongoose";
 import Mute from "@/components/alert/Mute";
-import { baseUrl, getDetails } from "@/utils/databaseMethods";
+import { getDetails } from "@/utils/databaseMethods";
 import { UserState, newUser } from "@/redux/features/userSlice";
 import Image from "next/image";
 
@@ -29,7 +25,6 @@ const Index = () => {
   const { level } = useAppSelector((state) => state.User);
   const dispatch = useAppDispatch();
   const [selectedBossIndex, setSelectedBossIndex] = useState<number>(4);
-  const [isLoading, setIsLoading] = useState(false);
   const [userData, setUserData] = useState<UserState>();
   const router = useRouter();
   const { Move, playBeep, Tony, Stop, Write, Suspense, Main } = useGameSounds();
@@ -136,7 +131,7 @@ const Index = () => {
       }
     }
     fetchDetails();
-  }, []);
+  }, [dispatch]);
   useEffect(() => {
     if (level) {
       setSelectedBossIndex(boss.length - level);

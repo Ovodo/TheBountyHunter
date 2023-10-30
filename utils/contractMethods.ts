@@ -1,5 +1,3 @@
-import { passport } from "@imtbl/sdk";
-import { baseConfig } from "../passport.config";
 import { ethers } from "ethers";
 import { config as immutableConfig, blockchainData } from "@imtbl/sdk";
 import { RewardNft } from "@/types/ethers-contracts/RewardNft";
@@ -8,7 +6,6 @@ import { RewardNft__factory } from "@/types/ethers-contracts/factories/RewardNft
 import { BTY__factory } from "@/types/ethers-contracts/factories/BTY__factory";
 import { Provider } from "@/types/Provider";
 import { hexToDecimalBigNumber } from "./helperFunctions";
-import { MyERC721, MyERC721__factory } from "@/types/ethers-contracts";
 import usePassport from "@/hooks/usePassport";
 
 const CONTRACT_ADDRESS = "0xC567F9776545b4Cc8634d91E146E264712d96E49"; // The address of the deployed collection contract

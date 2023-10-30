@@ -1,15 +1,10 @@
 // `use Client`;
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import usePassport from "@/hooks/usePassport";
 import { useRouter } from "next/router";
 import Layout from "@/components/layout";
 import PageLoader from "@/components/layout/PageLoader";
-import {
-  getData,
-  mint,
-  getBalance,
-  transferTokens,
-} from "@/utils/contractMethods";
+import { transferTokens } from "@/utils/contractMethods";
 import useGameSounds from "@/hooks/useGameSounds";
 import Mute from "@/components/alert/Mute";
 import { postAddress } from "@/utils/databaseMethods";
@@ -66,17 +61,22 @@ export default function Home() {
     await passports.logout();
   };
 
-  function handleMenuAction(x: number) {
-    let routeToNavigate = menuItems[x].toLowerCase();
-    if (routeToNavigate === "start") {
-      routeToNavigate = "/ready";
-    } else if (routeToNavigate === "leave") {
-      Logout();
-      routeToNavigate = "/logout";
-    }
-    router.push(routeToNavigate);
-    // playSus();
-  }
+  const handleMenuAction = useCallback(
+    (x: number) => {
+      let routeToNavigate = menuItems[x].toLowerCase();
+
+      if (routeToNavigate === "start") {
+        routeToNavigate = "/ready";
+      } else if (routeToNavigate === "leave") {
+        Logout();
+        routeToNavigate = "/logout";
+      }
+
+      router.push(routeToNavigate);
+      // playSus();
+    },
+    [menuItems, Logout, router]
+  );
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       switch (event.key) {

@@ -1,37 +1,20 @@
-import { Inter } from "next/font/google";
 import { Metal_Mania } from "next/font/google";
-import { Poppins } from "next/font/google";
-import React, { useEffect, useState } from "react";
-import usePassport from "@/hooks/usePassport";
+import React, { useState } from "react";
 import { useRouter } from "next/router";
 import Layout from "@/components/layout";
 import useGameSounds from "@/hooks/useGameSounds";
 import Image from "next/image";
 
-const inter = Inter({ subsets: ["latin"] });
 const metal = Metal_Mania({ weight: "400", subsets: ["latin-ext"] });
-const poppins = Poppins({ weight: "500", subsets: ["devanagari"] });
-
-type User = {
-  email: String | undefined;
-  nickname: String | undefined;
-};
 
 export default function Index() {
-  const [user, setUser] = React.useState<string | null>(null);
-  const [address, setAddress] = React.useState<string | null>(null);
-  const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>(0);
   const [enterAudio, setEnterAudio] = useState<HTMLAudioElement>();
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isPlaying2, setIsPlaying2] = useState(false);
-
-  const menuItems = ["Start", "Options", "Shop", "Difficulty", "Hunter"];
-  const route = ["/arena", "Options", "Shop", "Difficulty", "Hunter"];
   const router = useRouter();
   const { Tony } = useGameSounds();
 
   const Login = async () => {
     Tony.play();
+    enterAudio?.play();
     router.push("/");
   };
 
@@ -70,9 +53,8 @@ export default function Index() {
             {/* Connect your passport to begin */}
           </p>
           <button
-            disabled={address ? true : false}
             onClick={Login}
-            className={`px-6 ${user} text-black disabled:text-[rgb(174,93,46)] disabled:opacity-50 disabled:scale-100 disabled:bg-[rgb(248,255,233)] disabled:text-base  absolute hover:text-lg left-2 top-[500px] active:scale-95 duration-200 hover:bg-[rgb(174,93,46)] hover:text-[rgb(248,255,213)] ${metal.className} py-2 rounded-md bg-[rgb(248,255,213)]`}
+            className={`px-6  text-black disabled:text-[rgb(174,93,46)] disabled:opacity-50 disabled:scale-100 disabled:bg-[rgb(248,255,233)] disabled:text-base  absolute hover:text-lg left-2 top-[500px] active:scale-95 duration-200 hover:bg-[rgb(174,93,46)] hover:text-[rgb(248,255,213)] ${metal.className} py-2 rounded-md bg-[rgb(248,255,213)]`}
           >
             {"Home"}
           </button>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import useFonts from "@/hooks/useFonts";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { claimRewards, getDetails, mintToken } from "@/utils/databaseMethods";
+import { getDetails, mintToken } from "@/utils/databaseMethods";
 import { newUser } from "@/redux/features/userSlice";
 import {
   getBalance,
