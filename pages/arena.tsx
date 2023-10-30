@@ -103,16 +103,20 @@ const Arena = () => {
     }
 
     return () => clearTimeout(timerId); // clear the timeout if the component is unmounted or if it re-renders
-  }, [time]);
+  }, [time,winner]);
 
   let formattedTime = `${Math.floor(time / 60)
     .toString()
     .padStart(2, "0")}:${(time % 60).toString().padStart(2, "0")}`;
 
-  let rewardBounty: number = 0;
-  let incrementRate: number;
 
   useEffect(() => {
+
+
+  let rewardBounty: number = 0;
+
+  let incrementRate: number;
+
     if (winner) {
       switch (level) {
         case 1:
