@@ -70,23 +70,7 @@ const Arena = () => {
     Stop();
   };
 
-  async function advanceLvl() {
-    if (User.level > level) {
-      console.log("Already passed this level");
-
-      return;
-    }
-    try {
-      const response = await levelUp(
-        sessionStorage.getItem("address") as string
-      );
-      console.log(response);
-
-      return response;
-    } catch (error) {
-      console.error("Error advancing level:", error);
-    }
-  }
+  
 
   useEffect(() => {
     if (time <= 0) {
@@ -112,6 +96,24 @@ const Arena = () => {
 
   useEffect(() => {
 
+
+async function advanceLvl() {
+    if (User.level > level) {
+      console.log("Already passed this level");
+
+      return;
+    }
+    try {
+      const response = await levelUp(
+        sessionStorage.getItem("address") as string
+      );
+      console.log(response);
+
+      return response;
+    } catch (error) {
+      console.error("Error advancing level:", error);
+    }
+  }
 
   let rewardBounty: number = 0;
 
@@ -169,7 +171,7 @@ const Arena = () => {
         Stop();
       }, 6000);
     }
-  }, [timeup, tries, winner]);
+  }, [timeup, tries, winner, advanceLvl, over, coins, User.Rewards, Stop, cheer,level]);
   // React.useEffect(() => {}, [winner]);
 
   return (
