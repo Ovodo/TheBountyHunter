@@ -15,7 +15,6 @@ import Mute from "@/components/alert/Mute";
 import { postAddress } from "@/utils/databaseMethods";
 import useFonts from "@/hooks/useFonts";
 
-const { metal, poppins } = useFonts();
 const menuItems = [
   "Start",
   "Hunter",
@@ -27,18 +26,19 @@ const menuItems = [
 ];
 
 export default function Home() {
+  const { metal, poppins } = useFonts();
   const [user, setUser] = React.useState<string | null>(null);
   const [address, setAddress] = React.useState<string | null>(null);
   const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
   const { Stop, Move, Crash } = useGameSounds();
   const router = useRouter();
+  const { passports, provider } = usePassport();
 
   const Login = async () => {
     setIsLoading(true);
     console.log("tesst");
 
-    const { passports, provider } = usePassport();
     const accounts = await provider.request({
       method: "eth_requestAccounts",
     });
@@ -62,7 +62,6 @@ export default function Home() {
 
     sessionStorage.removeItem("name");
     sessionStorage.removeItem("address");
-    const { passports, provider } = usePassport();
     await passports.logout();
   };
 

@@ -14,9 +14,8 @@ import { useRouter } from "next/router";
 import usePassport from "@/hooks/usePassport";
 import NotificationEvent from "@/components/alert/NotificationEvent";
 
-const { metal, poppins } = useFonts();
-
 const Index = () => {
+  const { metal, poppins } = useFonts();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { level, Rewards, address, Nft } = useAppSelector(
@@ -25,6 +24,7 @@ const Index = () => {
   const [balance, SetBalance] = useState<number | string>("⏳");
   const [isLoading, setIsLoading] = useState(true);
   const { Tony, Stop } = useGameSounds();
+  const { provider } = usePassport();
 
   async function fetchDetails() {
     try {
@@ -46,7 +46,6 @@ const Index = () => {
 
   const Claim = async () => {
     setIsLoading(true);
-    const { provider } = usePassport();
 
     try {
       if (Rewards == 0) {
@@ -68,14 +67,12 @@ const Index = () => {
 
   const test = async () => {
     setIsLoading(true);
-    const { provider } = usePassport();
     const trans = await transferTokens(provider, "1000");
     console.log(trans);
     setIsLoading(false);
   };
   const mintNFT = async () => {
     setIsLoading(true);
-    const { provider } = usePassport();
     const trans = await mintRandom(provider);
     await mintToken(address, "");
     console.log(trans);
