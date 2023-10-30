@@ -6,13 +6,13 @@ import React from "react";
 
 const Index = () => {
   const router = useRouter();
+  let { passports } = usePassport();
   React.useEffect(() => {
-    let { passports } = usePassport();
     passports.loginCallback();
     router.push("/");
 
     return () => {};
-  }, []);
+  }, [router]);
 
   return <PageLoader loading={true} />;
 };

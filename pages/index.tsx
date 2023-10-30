@@ -15,7 +15,6 @@ import Mute from "@/components/alert/Mute";
 import { postAddress } from "@/utils/databaseMethods";
 import useFonts from "@/hooks/useFonts";
 
-const { metal, poppins } = useFonts();
 const menuItems = [
   "Start",
   "Hunter",
@@ -27,6 +26,7 @@ const menuItems = [
 ];
 
 export default function Home() {
+  const { metal, poppins } = useFonts();
   const [user, setUser] = React.useState<string | null>(null);
   const [address, setAddress] = React.useState<string | null>(null);
   const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>(0);

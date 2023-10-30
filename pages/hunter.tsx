@@ -4,9 +4,8 @@ import useGameSounds from "@/hooks/useGameSounds";
 import { useRouter } from "next/router";
 import React from "react";
 
-const { metal, poppins } = useFonts();
-
 const Index = () => {
+  const { metal, poppins } = useFonts();
   const { Tony, Stop } = useGameSounds();
   const router = useRouter();
   return (

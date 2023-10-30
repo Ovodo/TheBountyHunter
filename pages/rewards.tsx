@@ -14,9 +14,8 @@ import { useRouter } from "next/router";
 import usePassport from "@/hooks/usePassport";
 import NotificationEvent from "@/components/alert/NotificationEvent";
 
-const { metal, poppins } = useFonts();
-
 const Index = () => {
+  const { metal, poppins } = useFonts();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { level, Rewards, address, Nft } = useAppSelector(
