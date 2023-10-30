@@ -2,6 +2,7 @@ import React from "react";
 import { Metal_Mania } from "next/font/google";
 import { motion, AnimatePresence } from "framer-motion";
 import { Container } from "postcss";
+import Image from "next/image";
 
 const metal = Metal_Mania({ weight: "400", subsets: ["latin-ext"] });
 
@@ -24,10 +25,11 @@ const PageLoader: React.FC<Props> = ({ loading }) => {
   return (
     <div className='flex w-screen bg-gradient-conic from-slate-900 via-teal-200 to-slate-500 overflow-hidden relative  h-screen items-center justify-between'>
       <div className='cover w-[65%]'>
-        <img
+        <Image
+          fill
           className='object-scale-down'
           src='/assets/images/roof.jpg'
-          alt=''
+          alt='loader_image'
         />
       </div>
       <div className='flex w-[35%]  h-full justify-center space-y-20 flex-col'>

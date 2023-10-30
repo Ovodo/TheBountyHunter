@@ -14,6 +14,7 @@ import useGameSounds from "@/hooks/useGameSounds";
 import Mute from "@/components/alert/Mute";
 import { postAddress } from "@/utils/databaseMethods";
 import useFonts from "@/hooks/useFonts";
+import Image from "next/image";
 
 const menuItems = [
   "Start",
@@ -163,13 +164,16 @@ export default function Home() {
             {user ? user : ""}
           </p>
         </div>
-        <img
-          className='cover  -z-[5] absolute'
-          src='/assets/images/hunter-1.png'
-          alt=''
-        />
+        <div className='w-[57%] h-full'>
+          <Image
+            fill
+            className='cover -z-[5] absolute'
+            src='/assets/images/hunter-1.png'
+            alt='main- image'
+          />
+        </div>
         <div
-          className={`flex flex-col h-screen z-20  px-4 w-[20%] space-y-10 pt-8  ${poppins.className} justify-start items-center text-lg  tracking-[1] leading-[normal]`}
+          className={`flex flex-col h-screen z-20  px-4 w-[18%] space-y-10 pt-8  ${poppins.className} justify-start items-center text-lg  tracking-[1] leading-[normal]`}
         >
           {menuItems.map((item, index) => (
             <button

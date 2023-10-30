@@ -13,6 +13,7 @@ import useGameSounds from "@/hooks/useGameSounds";
 import { useRouter } from "next/router";
 import usePassport from "@/hooks/usePassport";
 import NotificationEvent from "@/components/alert/NotificationEvent";
+import Image from "next/image";
 
 const Index = () => {
   const { metal, poppins } = useFonts();
@@ -124,13 +125,18 @@ const Index = () => {
           $BTY
         </h2>
         <div className='max-h-max max-w-max  relative items-center justify-center flex '>
-          <motion.img
+          <motion.div
             initial={{ rotate: 0 }}
             animate={{ rotate: 720 }}
             className={`w-[250px] h-[250px] animate-bounce bg-slate-500 rounded-full`}
-            src='/assets/images/bounty.jpg'
-            alt='hunter'
-          />
+          >
+            <Image
+              fill
+              className={`rounded-full`}
+              src='/assets/images/bounty.jpg'
+              alt='hunter'
+            />
+          </motion.div>
         </div>
         <button
           onClick={test}
@@ -152,13 +158,13 @@ const Index = () => {
           NFT
         </h2>
         <div className='max-h-max max-w-max  relative items-center justify-center flex '>
-          <motion.img
+          <motion.div
             initial={{ rotate: 0 }}
             animate={{ rotate: 720 }}
             className={`w-[250px] h-[250px] bg-slate-500 rounded-full`}
-            src={Nft}
-            alt='hunter'
-          />
+          >
+            <Image fill src={Nft} alt='hunter' />
+          </motion.div>
           <h1
             className={`${metal.className} text-appCream text-[100px] absolute`}
           >

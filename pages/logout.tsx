@@ -6,6 +6,7 @@ import usePassport from "@/hooks/usePassport";
 import { useRouter } from "next/router";
 import Layout from "@/components/layout";
 import useGameSounds from "@/hooks/useGameSounds";
+import Image from "next/image";
 
 const inter = Inter({ subsets: ["latin"] });
 const metal = Metal_Mania({ weight: "400", subsets: ["latin-ext"] });
@@ -42,7 +43,12 @@ export default function Index() {
     <Layout>
       <div className='relative [background:linear-gradient(90deg,rgba(0,0,0,0.8)_1.46%,rgba(13.63,20.14,12,0.72)_13.34%,rgba(50.7,74.92,44.64,0.5)_27.53%,rgba(91.64,135.43,80.69,0.26)_50.29%,rgba(135.88,200.81,119.65,0.04)_56.65%,rgba(103.44,163.01,88.54,0.21)_63.93%,rgba(48.61,99.14,35.98,0.56)_73.16%,rgba(22.79,69.06,11.22,0.72)_83.68%)]   flex flex-row justify-center w-full'>
         <div className='flex overflow-hidden items-center justify-center  h-screen'>
-          <img className='cover' src='/assets/images/two.jpg' alt='' />
+          <Image
+            fill
+            className='cover'
+            src='/assets/images/two.jpg'
+            alt='logout-image'
+          />
           <p
             style={{
               WebkitTextStroke: "1px #000000",
@@ -75,3 +81,5 @@ export default function Index() {
     </Layout>
   );
 }
+
+// 2 texts and 1 button placed absolutely by the left, a center image in the full page.

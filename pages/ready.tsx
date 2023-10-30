@@ -14,6 +14,7 @@ import { set } from "mongoose";
 import Mute from "@/components/alert/Mute";
 import { baseUrl, getDetails } from "@/utils/databaseMethods";
 import { UserState, newUser } from "@/redux/features/userSlice";
+import Image from "next/image";
 
 const pop = Poppins({ weight: "600", subsets: ["devanagari"] });
 const boss = [
@@ -216,13 +217,18 @@ const Index = () => {
           >
             Hunter
           </h2>
-          <motion.img
+          <motion.div
             initial={{ rotate: 0 }}
+            className='animate-pulse w-[250px] h-[250px] rounded-full'
             animate={{ rotate: 720 }}
-            className={`w-[250px] h-[250px] animate-pulse  rounded-full`}
-            src='/assets/images/jing-sun.jpg'
-            alt='hunter'
-          />
+          >
+            <Image
+              fill
+              className={` rounded-full`}
+              src='/assets/images/jing-sun.jpg'
+              alt='hunter'
+            />
+          </motion.div>
           <h2 className={`${metal.className} text-[36px] text-appBrown`}>
             Jing-Sun
           </h2>
@@ -256,13 +262,17 @@ const Index = () => {
                   >
                     lv {item.level}
                   </h2>
-                  <motion.img
+                  <motion.div
                     initial={{ rotate: 0 }}
                     animate={{ rotate: 720 }}
                     className='w-[250px] object-cover h-[250px] rounded-full'
-                    src={`/assets/images${item.src}`}
-                    alt='hunter'
-                  />
+                  >
+                    <Image
+                      fill
+                      src={`/assets/images${item.src}`}
+                      alt='hunter'
+                    />
+                  </motion.div>
                   <h2
                     className={`${metal.className} text-[36px] text-appBrown`}
                   >
