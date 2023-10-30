@@ -1,7 +1,4 @@
 // `use Client`;
-import { Inter } from "next/font/google";
-import { Metal_Mania } from "next/font/google";
-import { Poppins } from "next/font/google";
 import React, { useEffect, useState } from "react";
 import usePassport from "@/hooks/usePassport";
 import { useRouter } from "next/router";
@@ -16,20 +13,18 @@ import {
 import useGameSounds from "@/hooks/useGameSounds";
 import Mute from "@/components/alert/Mute";
 import { postAddress } from "@/utils/databaseMethods";
+import useFonts from "@/hooks/useFonts";
 
-const inter = Inter({ subsets: ["latin"] });
-const metal = Metal_Mania({ weight: "400", subsets: ["latin-ext"] });
-const poppins = Poppins({ weight: "500", subsets: ["devanagari"] });
+const { metal, poppins } = useFonts();
 const menuItems = [
   "Start",
-  // "Options",
-  // "Shop",
-  // "Difficulty",
+  "Hunter",
+  "Shop",
+  "Instructions",
   "Rewards",
   "Instructions",
   "Leave",
 ];
-const disable = "Options" || "Shop";
 
 export default function Home() {
   const [user, setUser] = React.useState<string | null>(null);
@@ -179,7 +174,7 @@ export default function Home() {
         >
           {menuItems.map((item, index) => (
             <button
-              // disabled={item == }
+              disabled={item === "Shop" || item === "Hunter" ? true : false}
               key={index.toString()}
               onMouseEnter={() => {
                 setSelectedMenuIndex(index);
@@ -194,7 +189,7 @@ export default function Home() {
                 selectedMenuIndex === index ? "highlighted" : ""
               }  active:scale-95 duration-200 hover:scale-110 ${
                 metal.className
-              } py-2 rounded-md text-black bg-[rgb(248,255,213)]`}
+              } py-2 rounded-md disabled:opacity-30 text-black bg-[rgb(248,255,213)]`}
             >
               {item}
             </button>

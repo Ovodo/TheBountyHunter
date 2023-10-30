@@ -1,40 +1,34 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# THE BOUNTY HUNTER
 
-## Getting Started
+## How the game works..
 
-First, run the development server:
+This is a simple game.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+At the beginning of each new level, you are meant to find the criminal by clicking on door handles to open them. After opening each door, a message will be printed on the right side of the screen indicating hints, or if the criminal has been found.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+At the beginning of each level, the player has a number of tries to open the doors and a countdown timer to find the criminal. As the level increases, the number of doors increases, hence making it more difficult to find the criminal.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+After finding each criminal, the player is rewarded with some game rewards (USD) which can be claimed for BTY tokens in the rewards section. After catching the level 5 Boss, the player is bestowed with an NFT which can also be minted from the rewards section.
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+## Functions in the smart contract
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+This game comprises of two smart contracts:
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- One for the Non-fungible BTY collections.
+- The other for the in-game ERC-20 BTY tokens.
 
-## Learn More
+There are two main functions in these contracts:
 
-To learn more about Next.js, take a look at the following resources:
+1. **PrimarySale**:
+   - For the NFT token.
+   - Takes in a token id as a parameter.
+   - Mints the specified token in the collection to the user's wallet address.
+2. **WithdrawTokens**:
+   - For the ERC-20 in-game currencies.
+   - Withdraws a specified amount of tokens from the smart contract to the user's wallet address.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+**Note**: This game was built in a hurry and later features will be added soon. Features like a shop, where players can shop for weapons and artifacts to help catch the tougher criminals. Also, users will be able to select particular hunters to hunt with and many more features to come.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+I hope you enjoy playing. Have fun!
