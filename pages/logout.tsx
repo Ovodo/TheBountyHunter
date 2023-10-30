@@ -20,8 +20,6 @@ export default function Index() {
   const [user, setUser] = React.useState<string | null>(null);
   const [address, setAddress] = React.useState<string | null>(null);
   const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>(0);
-  const [audio, setAudio] = useState<HTMLAudioElement>();
-  const [home, setHome] = useState<HTMLAudioElement>();
   const [enterAudio, setEnterAudio] = useState<HTMLAudioElement>();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPlaying2, setIsPlaying2] = useState(false);
@@ -29,72 +27,15 @@ export default function Index() {
   const menuItems = ["Start", "Options", "Shop", "Difficulty", "Hunter"];
   const route = ["/arena", "Options", "Shop", "Difficulty", "Hunter"];
   const router = useRouter();
-  const { playHome } = useGameSounds();
+  const { Tony } = useGameSounds();
 
   const Login = async () => {
-    playHome();
+    Tony.play();
     router.push("/");
   };
 
-  function handleKeyDown(event: KeyboardEvent) {
-    switch (event.key) {
-      case "ArrowUp":
-        setSelectedMenuIndex((prev) => (prev - 1 < 0 ? 0 : prev - 1));
-        if (audio) {
-          audio.currentTime = 0;
-          audio.volume = 0.5;
-          audio
-            .play()
-            .catch((error) => console.error("Audio play failed:", error));
-
-          setIsPlaying(true);
-          audio.addEventListener("ended", () => setIsPlaying(false));
-        }
-        break;
-      case "ArrowDown":
-        setSelectedMenuIndex((prev) =>
-          prev + 1 >= menuItems.length ? menuItems.length - 1 : prev + 1
-        );
-        if (audio) {
-          audio.currentTime = 0;
-          audio
-            .play()
-            .catch((error) => console.error("Audio play failed:", error));
-
-          setIsPlaying(true);
-          audio.addEventListener("ended", () => setIsPlaying(false));
-        }
-        break;
-      case "Enter":
-        if (enterAudio) {
-          enterAudio.currentTime = 0;
-          enterAudio.volume = 1;
-          enterAudio
-            .play()
-            .catch((error) => console.error("Audio play failed:", error));
-
-          setIsPlaying(true);
-          enterAudio.addEventListener("ended", () => setIsPlaying(false));
-        }
-        handleMenuAction(selectedMenuIndex);
-        break;
-    }
-  }
-
-  function handleMenuAction(x: number) {
-    router.push(route[x]);
-  }
-  useEffect(() => {
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [selectedMenuIndex]);
   React.useEffect(() => {
     setEnterAudio(new Audio("soft.mp3"));
-    setAudio(new Audio("click.wav"));
-    const homeSound = new Audio("tony.mp3");
-    setHome(homeSound);
   }, []);
 
   return (

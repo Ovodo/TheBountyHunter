@@ -70,12 +70,16 @@ export const transferTokens = async (provider: Provider, amount: string) => {
   try {
     const trans = await contract.withdrawTokens(userAddress, amountToSend);
     console.log("trans", trans);
+    alert("BTY claimed successfully");
   } catch (error) {
-    alert("Try disabling Pop up blocker");
+    console.log("Withdrawal Error:", error);
+
+    alert("Try disabling Pop up blocker/ check console for errors");
   }
   const balance = await contract.balanceOf(userAddress);
   const balance2 = hexToDecimalBigNumber(balance._hex);
   console.log(parseInt(balance2) / 10 ** 18);
+  return parseInt(balance2) / 10 ** 18;
 };
 
 export const mint = async (token_id: number, provider: Provider) => {
@@ -96,4 +100,47 @@ export const mint = async (token_id: number, provider: Provider) => {
   const hash = await contract.primarySale(token_id);
   await hash.wait();
   console.log(hash);
+};
+
+export const mintRandom = async (provider: Provider) => {
+  const providers = new ethers.providers.Web3Provider(provider);
+  const signer = providers.getSigner();
+  const userAddress = await signer.getAddress();
+
+  const contract: RewardNft = RewardNft__factory.connect(
+    CONTRACT_ADDRESS,
+    signer
+  );
+  const MAX_TRIES = 5;
+  let tries = 0;
+  let minted = false;
+  const triedTokenIds: number[] = [];
+
+  while (tries < MAX_TRIES) {
+    tries += 1;
+
+    // Randomly pick a token_id between 1 and 5
+    let token_id;
+    do {
+      token_id = Math.floor(Math.random() * 5) + 1;
+    } while (triedTokenIds.includes(token_id));
+
+    triedTokenIds.push(token_id);
+
+    // Check if the token is already minted using the exists function
+    const isMinted = await contract.exists(token_id);
+
+    if (!isMinted) {
+      // Mint the token if not already minted
+      const hash = await contract.primarySale(token_id);
+      await hash.wait();
+      console.log(hash);
+      minted = true;
+      break;
+    }
+  }
+
+  if (!minted) {
+    alert("There are no available tokens left to mint!");
+  }
 };

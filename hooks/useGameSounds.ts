@@ -13,7 +13,7 @@ const useGameSounds = () => {
     interrupt: true,
   });
   const [playBeep] = useSound("/neat_beep.mp3", { volume: 0.65 });
-  const [Write] = useSound("/write.mp3", { volume: 0.65, playbackRate: 1.86 });
+  const [Write] = useSound("/write.mp3", { volume: 0.85, playbackRate: 1.86 });
 
   var Suspense = new Howl({
     src: ["suspense.mp3"],

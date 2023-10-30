@@ -74,13 +74,13 @@ const GameBoard: React.FC = () => {
         break; // Break out of the outer loop
       }
     }
-    // console.log("rows, and cols", criminalRow, criminalCol);
-    // console.log("Board", board);
-    // console.log("hintBoard", hintBoard);
+    let probability =
+      level == 1 ? 0.6 : level == 2 ? 0.65 : level == 3 ? 0.7 : 0.95;
+
     // Scatter hints on the criminal's row
     if (criminalRow !== -1) {
       for (let j = 0; j < gameBoard[criminalRow].length; j++) {
-        if (Math.random() < 0.65) {
+        if (Math.random() < probability) {
           // 100% probability to scatter the hint
           hintBoard[j][criminalRow] =
             "Criminal's footprints were last seen on these roads";
@@ -91,7 +91,7 @@ const GameBoard: React.FC = () => {
     // Scatter hints on the criminal's column
     if (criminalCol !== -1) {
       for (let i = 0; i < gameBoard.length; i++) {
-        if (Math.random() < 0.65) {
+        if (Math.random() < probability) {
           // 100% probability to scatter the hint
           hintBoard[criminalCol][i] =
             "Criminal's footprints were last seen on these roads";
@@ -149,37 +149,17 @@ const GameBoard: React.FC = () => {
         tries == 0 || winner ? "bg-[#2C2C54]" : "bg-white"
       }  h-full flex-wrap mb-3 w-full`}
     >
-      <div className='absolute space-x-10 left-6 bottom-8'>
-        <button
-          className={`px-6 active:scale-95 text-black duration-200 hover:bg-[rgb(174,93,46)] hover:text-[rgb(248,255,213)] ${pop.className} py-2 rounded-md bg-[rgb(248,255,213)]`}
-          onClick={giveHint}
-        >
-          Hint
-        </button>
-        <button
-          className={`px-6 active:scale-95 text-black duration-200 hover:bg-[rgb(174,93,46)] hover:text-[rgb(248,255,213)] ${pop.className} py-2 rounded-md bg-[rgb(248,255,213)]`}
-          onClick={() => {
-            router.push("/");
-            Stop();
-            Tony.stop();
-            Tony.play();
-            Tony.fade(0, 1, 5000);
-          }}
-        >
-          Back
-        </button>
-      </div>
       <div className='absolute flex flex-col items-start top-4  left-4 '>
         <div
           className={`text-center   text-[#C89933] text-2xl font-bold mb-4 mt-auto ${pop.className}`}
         >
           {`Tries : ${tries} left`}
         </div>
-        <div
+        {/* <div
           className={`text-center  text-[#C89933] text-2xl font-bold mb-4 mt-auto ${pop.className}`}
         >
           {`Hints : ${hints} left`}
-        </div>
+        </div> */}
         <div
           className={`text-center  text-[#C89933] text-2xl font-bold mb-4 mt-auto ${pop.className}`}
         >

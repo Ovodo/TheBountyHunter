@@ -2,7 +2,7 @@ import clientPromise from "@/utils/mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function (req: NextApiRequest, res: NextApiResponse<any>) {
-  const { address } = req.body;
+  const { address } = req.query;
 
   try {
     const client = await clientPromise;
@@ -16,18 +16,16 @@ export default async function (req: NextApiRequest, res: NextApiResponse<any>) {
     if (existingWallet) {
       // If the wallet address exists, return an error message
       res.status(200).json({
-        message: "Wallet address already exists",
+        message: "User details retrieved",
         data: existingWallet,
       });
     } else {
       // If the wallet address does not exist, insert it into the database
-      await db
-        .collection("BTY")
-        .insertOne({ address: address, level: 1, BTY: 0, Rewards: 0 });
-      res.status(200).json({ msg: "Wallet inserted successfully" });
+
+      res.status(200).json({ msg: "User does not exist" });
     }
   } catch (e) {
-    console.error("Update Error:", e);
+    console.error("Fetch Error:", e);
     res
       .status(500)
       .json({ error: "An error occurred while updating the data" });
