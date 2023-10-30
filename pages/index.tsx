@@ -115,7 +115,7 @@ export default function Home() {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectedMenuIndex]);
+  }, [Crash, Move, Stop, handleMenuAction]);
 
   useEffect(() => {
     setUser(sessionStorage.getItem("name"));

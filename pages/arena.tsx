@@ -165,7 +165,7 @@ const Arena = () => {
         Stop();
       }, 6000);
     }
-  }, [timeup, tries, winner]);
+  }, [timeup, tries, winner, User.level]);
   // React.useEffect(() => {}, [winner]);
 
   return (
