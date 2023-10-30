@@ -27,23 +27,7 @@ const Index = () => {
   const { Tony, Stop } = useGameSounds();
   const { provider } = usePassport();
 
-  async function fetchDetails() {
-    try {
-      const response = await getDetails(
-        sessionStorage.getItem("address") as string
-      );
-      console.log(response);
-      dispatch(newUser(response.data));
-
-      const balance = await getBalance();
-
-      SetBalance(balance);
-
-      return response;
-    } catch (error) {
-      console.error("Error posting address:", error);
-    }
-  }
+  
 
   const Claim = async () => {
     setIsLoading(true);
@@ -81,6 +65,24 @@ const Index = () => {
   };
 
   useEffect(() => {
+
+async function fetchDetails() {
+    try {
+      const response = await getDetails(
+        sessionStorage.getItem("address") as string
+      );
+      console.log(response);
+      dispatch(newUser(response.data));
+
+      const balance = await getBalance();
+
+      SetBalance(balance);
+
+      return response;
+    } catch (error) {
+      console.error("Error posting address:", error);
+    }
+  }
     fetchDetails();
      setIsLoading(false);
   }, [isLoading,fetchDetails]);
