@@ -70,24 +70,6 @@ const Arena = () => {
     Stop();
   };
 
-  async function advanceLvl() {
-    if (User.level > level) {
-      console.log("Already passed this level");
-
-      return;
-    }
-    try {
-      const response = await levelUp(
-        sessionStorage.getItem("address") as string
-      );
-      console.log(response);
-
-      return response;
-    } catch (error) {
-      console.error("Error advancing level:", error);
-    }
-  }
-
   useEffect(() => {
     if (time <= 0) {
       setTimeup(true); // set timup to true
@@ -103,16 +85,35 @@ const Arena = () => {
     }
 
     return () => clearTimeout(timerId); // clear the timeout if the component is unmounted or if it re-renders
-  }, [time]);
+  }, [time, winner]);
 
   let formattedTime = `${Math.floor(time / 60)
     .toString()
     .padStart(2, "0")}:${(time % 60).toString().padStart(2, "0")}`;
 
-  let rewardBounty: number = 0;
-  let incrementRate: number;
-
   useEffect(() => {
+    async function advanceLvl() {
+      if (User.level > level) {
+        console.log("Already passed this level");
+
+        return;
+      }
+      try {
+        const response = await levelUp(
+          sessionStorage.getItem("address") as string
+        );
+        console.log(response);
+
+        return response;
+      } catch (error) {
+        console.error("Error advancing level:", error);
+      }
+    }
+
+    let rewardBounty: number = 0;
+
+    let incrementRate: number;
+
     if (winner) {
       switch (level) {
         case 1:
@@ -165,7 +166,18 @@ const Arena = () => {
         Stop();
       }, 6000);
     }
-  }, [timeup, tries, winner, User.level]);
+  }, [
+    timeup,
+    tries,
+    winner,
+    User.level,
+    over,
+    coins,
+    User.Rewards,
+    Stop,
+    cheer,
+    level,
+  ]);
   // React.useEffect(() => {}, [winner]);
 
   return (
@@ -235,7 +247,7 @@ const Arena = () => {
               >
                 <p className='animate-bounce flex flex-col space-y-4 text-center text-2xl text-[#2c2c54]'>
                   Congratulations. You caught the Pirate. 🏆{" "}
-                  <span>💲{rewardBounty}</span>
+                  <span>💲{hunterMoney}</span>
                   💰
                 </p>
                 {/* <button
