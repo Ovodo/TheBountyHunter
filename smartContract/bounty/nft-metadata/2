@@ -1,0 +1,25 @@
+{
+  "id": 2,
+  "image": "https://magenta-quiet-pike-706.mypinata.cloud/ipfs/QmaLmeVpbXDDeYbLLyFPt4n2ZWFq9ATTwfi6v8NC72oZCN",
+  "token_id": "2",
+  "background_color": null,
+  "animation_url": null,
+  "youtube_url": null,
+  "name": "Test zkEVM NFT",
+  "description": "This NFT is your badge for bringing in the level 2 criminal",
+  "external_url": null,
+  "attributes": [
+    {
+      "trait_type": "Hat",
+      "value": "Top Hat"
+    },
+    {
+      "trait_type": "Coat",
+      "value": "Tails"
+    },
+    {
+      "trait_type": "Neck",
+      "value": "Bow Tie"
+    }
+  ]
+}

@@ -2,9 +2,13 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import useFonts from "@/hooks/useFonts";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { claimRewards, getDetails } from "@/utils/databaseMethods";
+import { claimRewards, getDetails, mintToken } from "@/utils/databaseMethods";
 import { newUser } from "@/redux/features/userSlice";
-import { getBalance, transferTokens } from "@/utils/contractMethods";
+import {
+  getBalance,
+  mintRandom,
+  transferTokens,
+} from "@/utils/contractMethods";
 import useGameSounds from "@/hooks/useGameSounds";
 import { useRouter } from "next/router";
 import usePassport from "@/hooks/usePassport";
@@ -15,7 +19,9 @@ const { metal, poppins } = useFonts();
 const rewards = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { level, Rewards, address } = useAppSelector((state) => state.User);
+  const { level, Rewards, address, Nft } = useAppSelector(
+    (state) => state.User
+  );
   const [balance, SetBalance] = useState<number | string>("⏳");
   const [isLoading, setIsLoading] = useState(true);
   const { Tony, Stop } = useGameSounds();
@@ -67,11 +73,19 @@ const rewards = () => {
     console.log(trans);
     setIsLoading(false);
   };
+  const mintNFT = async () => {
+    setIsLoading(true);
+    const { provider } = usePassport();
+    const trans = await mintRandom(provider);
+    await mintToken(address, "");
+    console.log(trans);
+    setIsLoading(false);
+  };
 
   useEffect(() => {
     fetchDetails();
-    setIsLoading(false);
-  }, []);
+    // setIsLoading(false);
+  }, [isLoading]);
   return (
     <div className='flex w-screen bg-gradient-radial to-slate-900 via-teal-200 from-slate-500 overflow-hidden relative  h-screen items-center justify-between'>
       <div>{isLoading && <NotificationEvent title='Loading...⏳ ' />}</div>
@@ -145,7 +159,7 @@ const rewards = () => {
             initial={{ rotate: 0 }}
             animate={{ rotate: 720 }}
             className={`w-[250px] h-[250px] bg-slate-500 rounded-full`}
-            src=''
+            src={Nft}
             alt='hunter'
           />
           <h1
@@ -155,9 +169,11 @@ const rewards = () => {
           </h1>
         </div>
         <button
-          className={`px-6 text-black disabled:text-[rgb(174,93,46)] disabled:opacity-50 disabled:scale-100 disabled:bg-[rgb(248,255,233)] disabled:text-base   hover:scale-110  active:scale-95 duration-200 hover:bg-[rgb(174,93,46)] hover:text-[rgb(248,255,213)] ${metal.className} py-2 rounded-md bg-[rgb(248,255,213)]`}
+          disabled={level <= 5}
+          onClick={mintNFT}
+          className={`px-6 text-black disabled:text-[rgb(174,93,46)] disabled:opacity-30 disabled:scale-100 disabled:bg-[rgb(248,255,233)] disabled:text-base   hover:scale-110  active:scale-95 duration-200 hover:bg-[rgb(174,93,46)] hover:text-[rgb(248,255,213)] ${metal.className} py-2 rounded-md bg-[rgb(248,255,213)]`}
         >
-          {level < 5 ? "Not Enabled" : "Mint"}
+          {level <= 5 ? "Not Enabled" : "Mint"}
         </button>
       </section>
     </div>

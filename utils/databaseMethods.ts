@@ -52,3 +52,16 @@ export const claimRewards = async (address: string, Rewards: string) => {
     throw error;
   }
 };
+export const mintToken = async (address: string, NFT: string) => {
+  try {
+    const response = await axios.get(`${baseUrl}/api/mint`, {
+      params: {
+        address: address,
+        NFT: NFT,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

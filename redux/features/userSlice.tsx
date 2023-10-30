@@ -4,7 +4,7 @@ export type UserState = {
   id?: number;
   level: number;
   address: string;
-  Nft: number;
+  Nft: string;
   Rewards: number;
   //   winner: boolean;
 };
@@ -13,7 +13,7 @@ const initialState = {
   id: 0,
   level: 1,
   address: "",
-  Nft: 0,
+  Nft: "",
   Rewards: 0,
   //   winner: false,
 } as UserState;

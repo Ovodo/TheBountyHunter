@@ -12,7 +12,6 @@ import { MyERC721, MyERC721__factory } from "@/types/ethers-contracts";
 import usePassport from "@/hooks/usePassport";
 
 const CONTRACT_ADDRESS = "0xC567F9776545b4Cc8634d91E146E264712d96E49"; // The address of the deployed collection contract
-const CONTRACT_ADDRESS2 = "0x70a2E9284abec0Ed90F8Cd66C335b34eF28854b7"; // The address of the deployed collection contract
 const ERC20_CONTRACT = "0x90c55d3c06Df183CA3DAbb30f9E744bE60628FB8";
 const TOKEN_ID = "2";
 const config: blockchainData.BlockchainDataModuleConfiguration = {
@@ -136,7 +135,8 @@ export const mintRandom = async (provider: Provider) => {
       await hash.wait();
       console.log(hash);
       minted = true;
-      break;
+      return hash;
+      // break;
     }
   }
 

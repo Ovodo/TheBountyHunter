@@ -32,8 +32,15 @@ export default async function (req: NextApiRequest, res: NextApiResponse<any>) {
         case 5:
           rewardIncrement = 100000;
           break;
+        case 6:
+          return;
         default:
           rewardIncrement = 0; // Set a default value or handle other levels as needed
+      }
+
+      if (existingWallet.level > 5) {
+        alert("No more Criminals at this moment");
+        return;
       }
 
       // Update the level and rewards
