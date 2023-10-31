@@ -9,7 +9,7 @@ const usePassport = () => {
     baseConfig,
     clientId: "o5aqv2ZjzXgKQkGvZqEzVJ491DQ0bWsk",
     logoutRedirectUri: `${baseUrl}/logout`,
-    redirectUri: "http://localhost:3000/auth",
+    redirectUri: `${baseUrl}/auth`,
     audience: "platform_api",
     scope: "openid offline_access email transact",
     // Passport specific configuration
