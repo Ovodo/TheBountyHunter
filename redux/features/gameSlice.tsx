@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type GameState = {
-  level: number;
+  stage: number;
   tries: number;
   hint: number;
   timer: number;
@@ -9,7 +9,7 @@ type GameState = {
 };
 
 const initialState = {
-  level: 1,
+  stage: 1,
   tries: 5,
   hint: 0,
   timer: 30,
@@ -22,9 +22,9 @@ export const counter = createSlice({
   reducers: {
     reset: () => initialState,
     upLevel: (state) => {
-      state.level += 1;
-      state.tries = state.level * 5;
-      switch (state.level) {
+      state.stage += 1;
+      state.tries = state.stage * 5;
+      switch (state.stage) {
         case 2:
           state.timer = 45;
           break;
@@ -43,9 +43,9 @@ export const counter = createSlice({
       }
     },
     setLevel: (state, action: PayloadAction<number>) => {
-      state.level = action.payload;
-      state.tries = state.level * 5;
-      switch (state.level) {
+      state.stage = action.payload;
+      state.tries = state.stage * 5;
+      switch (state.stage) {
         case 2:
           state.timer = 45;
           break;
@@ -70,7 +70,7 @@ export const counter = createSlice({
       state.winner = action.payload;
     },
     setTries: (state) => {
-      state.tries = state.level * 5;
+      state.tries = state.stage * 5;
     },
     decTries: (state) => {
       state.tries -= 1;

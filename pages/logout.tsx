@@ -11,10 +11,10 @@ const metal = Metal_Mania({ weight: "400", subsets: ["latin-ext"] });
 export default function Index() {
   const [enterAudio, setEnterAudio] = useState<HTMLAudioElement>();
   const router = useRouter();
-  const { Tony } = useGameSounds();
+  // const { Tony } = useGameSounds();
 
   const Login = async () => {
-    Tony.play();
+    // Tony.play();
     enterAudio?.play();
     router.push("/");
   };

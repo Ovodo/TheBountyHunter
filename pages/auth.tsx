@@ -5,6 +5,8 @@ import { useRouter } from "next/router";
 import React from "react";
 
 const Index = () => {
+  console.log("auth page");
+
   const router = useRouter();
   let { passports } = usePassport();
   React.useEffect(() => {

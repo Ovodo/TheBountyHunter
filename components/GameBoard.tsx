@@ -13,10 +13,10 @@ import useGameSounds from "@/hooks/useGameSounds";
 const pop = Poppins({ weight: "700", subsets: ["latin-ext"] });
 
 const GameBoard: React.FC = () => {
-  const { timer, tries, hint, winner, level } = useAppSelector(
+  const { timer, tries, hint, winner, stage } = useAppSelector(
     (state) => state.App
   );
-  const [board, setBoard] = useState<string[][]>(generateBoard(level));
+  const [board, setBoard] = useState<string[][]>(generateBoard(stage));
   const [message, setMessage] = useState<string>("");
   const [open, setOpen] = useState<boolean>(false);
   const [hints, setHints] = useState<number>(hint);
@@ -24,17 +24,18 @@ const GameBoard: React.FC = () => {
     generateHintBoard(board)
   );
   const [clickedSlot, setClickedSlot] = useState<[number, number] | null>(null);
-  const slotWidth: String = (100 / (3 * level)) as unknown as string; // Calculate the width percentage
+  const slotWidth: String = (100 / (3 * stage)) as unknown as string; // Calculate the width percentage
   const router = useRouter();
-  const [play, { stop }] = useSound("/tony.mp3", { volume: 0.7 });
+  const [cheer] = useSound("/cheer.mp3", { volume: 0.7 });
+  const [coins] = useSound("/coins.mp3", { volume: 0.7 });
   const [play2] = useSound("/door.wav", { volume: 0.7 });
   const dispatch = useAppDispatch();
   const { Stop, Tony } = useGameSounds();
 
   //  ---------------------------------Functions and Effects
 
-  function generateBoard(level: number): string[][] {
-    let size = 3 * level;
+  function generateBoard(stage: number): string[][] {
+    let size = 3 * stage;
     let newBoard = Array(size)
       .fill(null)
       .map(() => Array(size).fill(null));
@@ -43,7 +44,7 @@ const GameBoard: React.FC = () => {
     const y = Math.floor(Math.random() * size);
     newBoard[x][y] = "Criminal";
 
-    for (let i = 0; i < level - 1; i++) {
+    for (let i = 0; i < stage - 1; i++) {
       let decoyX: number, decoyY: number;
       do {
         decoyX = Math.floor(Math.random() * size);
@@ -74,7 +75,7 @@ const GameBoard: React.FC = () => {
       }
     }
     let probability =
-      level == 1 ? 0.6 : level == 2 ? 0.65 : level == 3 ? 0.7 : 0.95;
+      stage == 1 ? 0.6 : stage == 2 ? 0.65 : stage == 3 ? 0.7 : 0.95;
 
     // Scatter hints on the criminal's row
     if (criminalRow !== -1) {
@@ -102,16 +103,14 @@ const GameBoard: React.FC = () => {
   }
 
   function handleClick(x: number, y: number): void {
-    // if (tries == 0) {
-    //   setMessage("Game over! No tries left.");
-    //   return;
-    // }
     play2();
     setOpen(!open);
     setClickedSlot([x, y]);
     if (board[x][y] === "Criminal") {
       setMessage("You found the criminal!");
       dispatch(setWinner(true));
+      coins();
+      cheer();
     } else if (hintBoard[x][y]) {
       setMessage(hintBoard[x][y]);
     } else if (board[x][y] === "Decoy") {
@@ -120,13 +119,6 @@ const GameBoard: React.FC = () => {
       setMessage("Empty! Keep searching.");
     }
 
-    // if (board[x][y] === "Criminal") {
-    //   setMessage("You found the criminal!");
-    // } else if (board[x][y] === "Decoy") {
-    //   setMessage("Decoy! Try again!");
-    // } else {
-    //   setMessage("Empty! Keep searching.");
-    // }
     dispatch(decTries());
   }
 
@@ -135,7 +127,6 @@ const GameBoard: React.FC = () => {
       setMessage("No hints left!");
       return;
     }
-    // play();
     stop();
     setHints(hints - 1);
   }
@@ -162,7 +153,7 @@ const GameBoard: React.FC = () => {
         <div
           className={`text-center  text-[#C89933] text-2xl font-bold mb-4 mt-auto ${pop.className}`}
         >
-          {`Level : ${level}`}
+          {`Level : ${stage}`}
         </div>
       </div>
       <div
@@ -195,7 +186,7 @@ const GameBoard: React.FC = () => {
                       "-translate-y-[95%]"
                     : ""
                 } bg-[#C89933] ${
-                  tries == level * 5 ? "translate-y-[0%]" : ""
+                  tries == stage * 5 ? "translate-y-[0%]" : ""
                 } z-20 relative  duration-[3000ms] h-full border border-teal-950 flex justify-center items-center`}
               >
                 <button

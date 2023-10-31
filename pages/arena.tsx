@@ -1,5 +1,5 @@
 import GameBoard from "@/components/GameBoard";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Poppins } from "next/font/google";
 import { motion } from "framer-motion";
 import Spin from "@/components/layout/Spin";
@@ -16,18 +16,17 @@ const pop = Poppins({ weight: "600", subsets: ["devanagari"] });
 
 const Arena = () => {
   // Timer logic
-  const { timer, winner, tries, level } = useAppSelector((state) => state.App);
-  const { User } = useAppSelector((state) => state);
+  const { timer, winner, tries, stage } = useAppSelector((state) => state.App);
+  const { level, Rewards } = useAppSelector((state) => state.User);
   const dispatch = useAppDispatch();
   const [timeup, setTimeup] = useState<boolean>(false);
   const [time, setTime] = useState<number>(timer);
-  const [hunterMoney, setHunterMoney] = useState<number>(User.Rewards);
+  const [hunterMoney, setHunterMoney] = useState<number>(Rewards);
   const [bty, setBty] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
   const { Main, Stop, Tony } = useGameSounds();
   const [over] = useSound("/over.mp3", { volume: 0.65 });
-  const [cheer] = useSound("/cheer.mp3", { volume: 0.7 });
-  const [coins] = useSound("/coins.mp3", { volume: 0.7 });
+
   const router = useRouter();
 
   const restartGame = () => {
@@ -50,9 +49,8 @@ const Arena = () => {
   };
   const nextLvl = () => {
     setIsLoading(true);
-    setTimeup(false); // set timup to true
+    setTimeup(false);
     setTimeout(() => {
-      // dispatch(reset());
       setIsLoading(false);
     }, 2000);
     dispatch(setWinner(false));
@@ -61,6 +59,23 @@ const Arena = () => {
     Stop();
   };
 
+  const advanceLvl = useCallback(async () => {
+    if (level > stage) {
+      console.log("Already passed this level");
+
+      return;
+    }
+    try {
+      const response = await levelUp(
+        sessionStorage.getItem("address") as string
+      );
+      console.log(response);
+
+      return response;
+    } catch (error) {
+      console.error("Error advancing level:", error);
+    }
+  }, [level, stage]);
   useEffect(() => {
     if (time <= 0) {
       setTimeup(true); // set timup to true
@@ -83,70 +98,47 @@ const Arena = () => {
     .padStart(2, "0")}:${(time % 60).toString().padStart(2, "0")}`;
 
   useEffect(() => {
-    async function advanceLvl() {
-      if (User.level > level) {
-        console.log("Already passed this level");
-
-        return;
-      }
-      try {
-        const response = await levelUp(
-          sessionStorage.getItem("address") as string
-        );
-        console.log(response);
-
-        return response;
-      } catch (error) {
-        console.error("Error advancing level:", error);
-      }
-    }
-
     let rewardBounty: number = 0;
 
     let incrementRate: number;
 
+    switch (stage) {
+      case 1:
+        rewardBounty = 1000; // Set your reward amount here
+        incrementRate = 10;
+        break;
+
+      case 2:
+        rewardBounty = 5000; // Set your reward amount here
+        incrementRate = 50;
+        break;
+      case 3:
+        rewardBounty = 20000; // Set your reward amount here
+        incrementRate = 200;
+        break;
+      case 4:
+        rewardBounty = 50000; // Set your reward amount here
+        incrementRate = 500;
+        break;
+      case 5:
+        rewardBounty = 100000; // Set your reward amount here
+        incrementRate = 100;
+        break;
+
+      default:
+        0;
+        break;
+    }
     if (winner) {
-      switch (level) {
-        case 1:
-          rewardBounty = 1000; // Set your reward amount here
-          incrementRate = 10;
-          break;
-
-        case 2:
-          rewardBounty = 5000; // Set your reward amount here
-          incrementRate = 50;
-          break;
-        case 3:
-          rewardBounty = 20000; // Set your reward amount here
-          incrementRate = 200;
-          break;
-        case 4:
-          rewardBounty = 50000; // Set your reward amount here
-          incrementRate = 500;
-          break;
-        case 5:
-          rewardBounty = 100000; // Set your reward amount here
-          incrementRate = 100;
-          break;
-
-        default:
-          0;
-          break;
-      }
       const interval = setInterval(() => {
         setHunterMoney((prev) => {
-          if (prev + incrementRate >= rewardBounty + User.Rewards) {
+          if (prev + incrementRate >= rewardBounty + Rewards) {
             clearInterval(interval);
-            return rewardBounty + User.Rewards;
+            return rewardBounty + Rewards;
           }
-          // You can play a coin sound effect here as the money increases
           return prev + incrementRate;
         });
       }, 55);
-      coins();
-      cheer();
-
-      // dispatch(upLevel());
       advanceLvl();
     }
 
@@ -157,19 +149,7 @@ const Arena = () => {
         Stop();
       }, 6000);
     }
-  }, [
-    timeup,
-    tries,
-    winner,
-    User.level,
-    over,
-    coins,
-    User.Rewards,
-    Stop,
-    cheer,
-    level,
-  ]);
-  // React.useEffect(() => {}, [winner]);
+  }, [timeup, tries, winner, Rewards]);
 
   return (
     <Spin>
