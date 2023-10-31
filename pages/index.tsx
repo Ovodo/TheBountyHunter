@@ -4,7 +4,6 @@ import usePassport from "@/hooks/usePassport";
 import { useRouter } from "next/router";
 import Layout from "@/components/layout";
 import PageLoader from "@/components/layout/PageLoader";
-import { transferTokens } from "@/utils/contractMethods";
 import useGameSounds from "@/hooks/useGameSounds";
 import Mute from "@/components/alert/Mute";
 import { postAddress } from "@/utils/databaseMethods";
@@ -12,7 +11,6 @@ import useFonts from "@/hooks/useFonts";
 import Image from "next/image";
 import HomeImage from "@/public/assets/images/hunter-1.png";
 import NotificationEvent from "@/components/alert/NotificationEvent";
-import { log } from "console";
 
 const menuItems = [
   "Start",
@@ -35,32 +33,25 @@ export default function Home() {
 
   const Login = async () => {
     setIsLoading(true);
-    console.log("tesst");
 
+    const accounts = await provider.request({
+      method: "eth_requestAccounts",
+    });
+    console.log("requesting user info");
+
+    let user = await passports.getUserInfo();
+
+    sessionStorage.setItem("name", user?.email?.split("@")[0] as string);
+    setUser(sessionStorage.getItem("name"));
+
+    sessionStorage.setItem("address", accounts[0] as string);
+    setAddress(sessionStorage.getItem("address"));
     try {
-      const accounts = await provider.request({
-        method: "eth_requestAccounts",
-      });
-      console.log("requesting user info");
-
-      console.log(accounts);
+      const response = await postAddress(accounts[0] as string);
+      console.log(response);
     } catch (error) {
-      console.log(error);
+      console.error("Error posting address:", error);
     }
-
-    // let user = await passports.getUserInfo();
-
-    // sessionStorage.setItem("name", user?.email?.split("@")[0] as string);
-    // setUser(sessionStorage.getItem("name"));
-
-    // sessionStorage.setItem("address", accounts[0] as string);
-    // setAddress(sessionStorage.getItem("address"));
-    // try {
-    //   const response = await postAddress(accounts[0] as string);
-    //   console.log(response);
-    // } catch (error) {
-    //   console.error("Error posting address:", error);
-    // }
     setIsLoading(false);
   };
 
@@ -121,7 +112,11 @@ export default function Home() {
           }, 2000);
           Suspense;
           setSelectedMenuIndex((currentSelectedIndex) => {
-            handleMenuAction(currentSelectedIndex);
+            if (address !== null) {
+              handleMenuAction(currentSelectedIndex);
+            } else {
+              alert("Connect passport to continue");
+            }
             return currentSelectedIndex;
           });
           break;
@@ -137,12 +132,10 @@ export default function Home() {
     setUser(sessionStorage.getItem("name"));
     setAddress(sessionStorage.getItem("address"));
   }, []);
-  // if (isLoading) {
-  //   return (
-  //     <div>{isLoading && <NotificationEvent title='Loading...⏳ ' />}</div>
-  //   );
-  //   // <PageLoader loading={isLoading} />;
-  // }
+  if (isLoading) {
+    return <div>{<NotificationEvent title='Loading...⏳ ' />}</div>;
+    // return <PageLoader loading={isLoading} />;
+  }
   return (
     <Layout>
       <div className='relative overflow-hidden [background:linear-gradient(90deg,rgba(0,0,0,0.8)_1.46%,rgba(13.63,20.14,12,0.72)_13.34%,rgba(50.7,74.92,44.64,0.5)_27.53%,rgba(91.64,135.43,80.69,0.26)_50.29%,rgba(135.88,200.81,119.65,0.04)_56.65%,rgba(103.44,163.01,88.54,0.21)_63.93%,rgba(48.61,99.14,35.98,0.56)_73.16%,rgba(22.79,69.06,11.22,0.72)_83.68%)]   flex flex-row justify-between w-screen'>
@@ -168,7 +161,9 @@ export default function Home() {
               metal.className
             } w-[300px] bg-clip-text [-webkit-text-fill-color:transparent] [text-fill-color:transparent] text-transparent text-[20px]  tracking-[0] leading-[normal]`}
           >
-            Connect your passport to begin
+            {address !== null
+              ? "Press Start"
+              : " Connect your passport to begin"}
           </p>
           <button
             disabled={address ? true : false}
@@ -197,7 +192,11 @@ export default function Home() {
         >
           {menuItems.map((item, index) => (
             <button
-              disabled={item === "Shop" || item === "Hunter" ? true : false}
+              disabled={
+                item === "Shop" || item === "Hunter" || address === null
+                  ? true
+                  : false
+              }
               key={index.toString()}
               onMouseEnter={() => {
                 setSelectedMenuIndex(index);

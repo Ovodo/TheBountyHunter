@@ -106,7 +106,7 @@ const Index = () => {
   useEffect(() => {
     const address = sessionStorage.getItem("address") as string;
     if (!address) {
-      console.log("No User Found");
+      console.log("Connect your passport");
       return;
     }
 

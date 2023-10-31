@@ -34,7 +34,7 @@ const Index = () => {
   const fetchDetails = useCallback(async () => {
     const address = sessionStorage.getItem("address") as string;
     if (!address) {
-      alert("No User Found");
+      alert("Connect your passport");
       return;
     }
     try {
@@ -48,7 +48,7 @@ const Index = () => {
 
       return response;
     } catch (error) {
-      console.error("Error posting address:", error);
+      console.error("Error Fetching details:", error);
     }
   }, [dispatch]);
 
@@ -75,7 +75,8 @@ const Index = () => {
   const mintNFT = async () => {
     setIsLoading(true);
     const nftData = await mintRandom(provider);
-    await mintToken(address, nftData);
+    const user = await mintToken(address, nftData);
+    console.log(user);
 
     fetchDetails();
     setIsLoading(false);
@@ -159,12 +160,20 @@ const Index = () => {
             animate={{ rotate: 720 }}
             className={`w-[250px] h-[250px] items-center justify-center flex bg-slate-500 rounded-full`}
           >
-            {typeof Nft?.image == "string" && (
-              <Image width={250} height={250} src={Nft?.image} alt='Nft' />
+            {typeof Nft?.image === "string" && (
+              <Image
+                width={250}
+                height={250}
+                className='rounded-full'
+                src={Nft.image}
+                alt='Nft'
+              />
             )}
           </motion.div>
           <h1
-            className={`${metal.className} text-appCream text-[100px] absolute`}
+            className={`${metal.className} ${
+              Nft.image && "hidden"
+            } text-appCream text-[100px] absolute`}
           >
             ?
           </h1>

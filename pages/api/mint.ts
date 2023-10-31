@@ -1,13 +1,21 @@
 import clientPromise from "@/utils/mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
-export default async function handler (req: NextApiRequest, res: NextApiResponse<any>) {
-  const { address, NFT } = req.query;
+// type Req = {
+//   address:string
+// }
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<any>
+) {
+  const { address, NFT } = req.body;
+  // console.log(req.body);
 
   try {
     const client = await clientPromise;
     const db = client.db("Bounty");
-    console.log(address);
+    console.log("address", address, "nft", NFT);
 
     // Check if the wallet address already exists in the database
     const existingWallet = await db
@@ -25,7 +33,7 @@ export default async function handler (req: NextApiRequest, res: NextApiResponse
       );
 
       res.status(200).json({
-        message: "NFT minted successfully",
+        message: "NFT minted successfully, Sent Data to DB",
         data: existingWallet,
       });
     } else {
