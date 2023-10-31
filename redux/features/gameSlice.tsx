@@ -69,8 +69,8 @@ export const counter = createSlice({
     setWinner: (state, action: PayloadAction<boolean>) => {
       state.winner = action.payload;
     },
-    setTimer: (state, action: PayloadAction<number>) => {
-      state.timer = action.payload;
+    setTries: (state) => {
+      state.tries = state.level * 5;
     },
     decTries: (state) => {
       state.tries -= 1;
@@ -83,7 +83,7 @@ export const {
   upHint,
   setLevel,
   reset,
-  setTimer,
+  setTries,
   decTries,
   setWinner,
 } = counter.actions;

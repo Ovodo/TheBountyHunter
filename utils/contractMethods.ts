@@ -7,9 +7,11 @@ import { BTY__factory } from "@/types/ethers-contracts/factories/BTY__factory";
 import { Provider } from "@/types/Provider";
 import { hexToDecimalBigNumber } from "./helperFunctions";
 import usePassport from "@/hooks/usePassport";
+import { mintToken } from "./databaseMethods";
 
 const CONTRACT_ADDRESS = "0xC567F9776545b4Cc8634d91E146E264712d96E49"; // The address of the deployed collection contract
 const ERC20_CONTRACT = "0x90c55d3c06Df183CA3DAbb30f9E744bE60628FB8";
+const ERC40_CONTRACT = "0x70a2E9284abec0Ed90F8Cd66C335b34eF28854b7";
 const TOKEN_ID = "2";
 const config: blockchainData.BlockchainDataModuleConfiguration = {
   baseConfig: new immutableConfig.ImmutableConfiguration({
@@ -18,12 +20,12 @@ const config: blockchainData.BlockchainDataModuleConfiguration = {
 };
 const client = new blockchainData.BlockchainData(config);
 
-export async function getData() {
+export async function getData(token_id: string) {
   try {
     const response = await client.getNFT({
       chainName: "imtbl-zkevm-testnet",
-      contractAddress: CONTRACT_ADDRESS,
-      tokenId: TOKEN_ID,
+      contractAddress: ERC40_CONTRACT,
+      tokenId: token_id,
     });
 
     console.log(response.result);
@@ -33,15 +35,13 @@ export async function getData() {
   }
 }
 
-export const getBalance = async (): Promise<number> => {
-  const { provider } = usePassport();
+export const getBalance = async (provider: Provider): Promise<number> => {
   await provider.request({
     method: "eth_requestAccounts",
   });
   const providers = new ethers.providers.Web3Provider(provider);
   const signer = providers.getSigner();
   const userAddress = await signer.getAddress();
-
   // // Create a new instance of the contract
   const contract: BTY = BTY__factory.connect(ERC20_CONTRACT, signer);
   const balance = await contract.balanceOf(userAddress);
@@ -79,6 +79,9 @@ export const transferTokens = async (provider: Provider, amount: string) => {
 };
 
 export const mint = async (token_id: number, provider: Provider) => {
+  await provider.request({
+    method: "eth_requestAccounts",
+  });
   const providers = new ethers.providers.Web3Provider(provider);
   const signer = providers.getSigner();
   const userAddress = await signer.getAddress();
@@ -99,12 +102,15 @@ export const mint = async (token_id: number, provider: Provider) => {
 };
 
 export const mintRandom = async (provider: Provider) => {
+  await provider.request({
+    method: "eth_requestAccounts",
+  });
   const providers = new ethers.providers.Web3Provider(provider);
   const signer = providers.getSigner();
   const userAddress = await signer.getAddress();
 
   const contract: RewardNft = RewardNft__factory.connect(
-    CONTRACT_ADDRESS,
+    ERC40_CONTRACT,
     signer
   );
   const MAX_TRIES = 5;
@@ -128,11 +134,12 @@ export const mintRandom = async (provider: Provider) => {
 
     if (!isMinted) {
       // Mint the token if not already minted
-      const hash = await contract.primarySale(token_id);
+      const hash = await contract.safeMint(userAddress, token_id);
       await hash.wait();
-      console.log(hash);
+      const nftData = getData(token_id.toString());
+
       minted = true;
-      return hash;
+      return nftData;
       // break;
     }
   }

@@ -24,10 +24,13 @@ const dotVariants = {
 const PageLoader: React.FC<Props> = ({ loading }) => {
   return (
     <div className='flex w-screen bg-gradient-conic from-slate-900 via-teal-200 to-slate-500 overflow-hidden relative  h-screen items-center justify-between'>
-      <div className='cover w-[65%]'>
+      <div className='w-[890px]'>
         <Image
-          fill
-          className='object-scale-down'
+          // fill={true}
+          priority
+          width={900}
+          height={900}
+          className='object-left object-scale-down'
           src='/assets/images/roof.jpg'
           alt='loader_image'
         />

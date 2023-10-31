@@ -4,7 +4,7 @@ export type UserState = {
   id?: number;
   level: number;
   address: string;
-  Nft: string;
+  Nft: any;
   Rewards: number;
   //   winner: boolean;
 };
@@ -13,7 +13,7 @@ const initialState = {
   id: 0,
   level: 1,
   address: "",
-  Nft: "",
+  Nft: {},
   Rewards: 0,
   //   winner: false,
 } as UserState;
@@ -25,11 +25,11 @@ export const counter = createSlice({
     newUser: (state, action: PayloadAction<UserState>) => {
       return action.payload;
     },
-    upLevel: (state) => {
-      state.level += 1;
+    newToken: (state, action: PayloadAction<any>) => {
+      state.Nft = action.payload;
     },
   },
 });
 
-export const { upLevel, newUser } = counter.actions;
+export const { newToken, newUser } = counter.actions;
 export default counter.reducer;

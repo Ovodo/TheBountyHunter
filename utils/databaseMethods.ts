@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const baseUrl =
   process.env.NODE_ENV === "production"
-    ? "https://bandbindex.com"
+    ? "https://bounty-khaki.vercel.app"
     : "http://localhost:3000";
 
 export const postAddress = async (address: string) => {
@@ -52,7 +52,7 @@ export const claimRewards = async (address: string, Rewards: string) => {
     throw error;
   }
 };
-export const mintToken = async (address: string, NFT: string) => {
+export const mintToken = async (address: string, NFT: any) => {
   try {
     const response = await axios.get(`${baseUrl}/api/mint`, {
       params: {

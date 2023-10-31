@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import useFonts from "@/hooks/useFonts";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { getDetails, mintToken } from "@/utils/databaseMethods";
+import { claimRewards, getDetails, mintToken } from "@/utils/databaseMethods";
 import { newUser } from "@/redux/features/userSlice";
 import {
   getBalance,
+  getData,
   mintRandom,
   transferTokens,
 } from "@/utils/contractMethods";
@@ -16,6 +17,7 @@ import { useRouter } from "next/router";
 import usePassport from "@/hooks/usePassport";
 import NotificationEvent from "@/components/alert/NotificationEvent";
 import Image from "next/image";
+import BountyImage from "@/public/assets/images/bounty.jpg";
 
 const Index = () => {
   const { metal, poppins } = useFonts();
@@ -29,6 +31,24 @@ const Index = () => {
   const { Tony, Stop } = useGameSounds();
   const { provider } = usePassport();
 
+  const fetchDetails = useCallback(async () => {
+    try {
+      const response = await getDetails(
+        sessionStorage.getItem("address") as string
+      );
+      dispatch(newUser(response.data));
+
+      console.log(response);
+      // const balance = await getBalance();
+
+      // SetBalance(balance);
+
+      return response;
+    } catch (error) {
+      console.error("Error posting address:", error);
+    }
+  }, [dispatch]);
+
   const Claim = async () => {
     setIsLoading(true);
 
@@ -39,8 +59,8 @@ const Index = () => {
       }
 
       const balance = await transferTokens(provider, Rewards.toString());
-      //   await claimRewards(address, Rewards.toString());
-      //   const balance = await getBalance();
+      await claimRewards(address, Rewards.toString());
+      // const balance = await getBalance();
 
       SetBalance(balance);
     } catch (error) {
@@ -50,41 +70,20 @@ const Index = () => {
     setIsLoading(false);
   };
 
-  const test = async () => {
-    setIsLoading(true);
-    const trans = await transferTokens(provider, "1000");
-    console.log(trans);
-    setIsLoading(false);
-  };
   const mintNFT = async () => {
     setIsLoading(true);
-    const trans = await mintRandom(provider);
-    await mintToken(address, "");
-    console.log(trans);
+    // await getBalance(provider);
+    const nftData = await mintRandom(provider);
+    await mintToken(address, nftData);
+
+    // fetchDetails();
     setIsLoading(false);
   };
 
   useEffect(() => {
-    async function fetchDetails() {
-      try {
-        const response = await getDetails(
-          sessionStorage.getItem("address") as string
-        );
-        console.log(response);
-        dispatch(newUser(response.data));
-
-        const balance = await getBalance();
-
-        SetBalance(balance);
-
-        return response;
-      } catch (error) {
-        console.error("Error posting address:", error);
-      }
-    }
-    fetchDetails();
+    // fetchDetails();
     setIsLoading(false);
-  }, [isLoading, dispatch]);
+  }, []);
   return (
     <div className='flex w-screen bg-gradient-radial to-slate-900 via-teal-200 from-slate-500 overflow-hidden relative  h-screen items-center justify-between'>
       <div>{isLoading && <NotificationEvent title='Loading...⏳ ' />}</div>
@@ -129,18 +128,13 @@ const Index = () => {
           <motion.div
             initial={{ rotate: 0 }}
             animate={{ rotate: 720 }}
-            className={`w-[250px] h-[250px] animate-bounce bg-slate-500 rounded-full`}
+            className={`w-[250px] h-[250px] relative animate-bounce bg-slate-500 rounded-full`}
           >
-            <Image
-              fill
-              className={`rounded-full`}
-              src='/assets/images/bounty.jpg'
-              alt='hunter'
-            />
+            <Image className={`rounded-full`} src={BountyImage} alt='hunter' />
           </motion.div>
         </div>
         <button
-          onClick={test}
+          onClick={Claim}
           className={`px-6 text-black disabled:text-[rgb(174,93,46)] disabled:opacity-50 disabled:scale-100 disabled:bg-[rgb(248,255,233)] disabled:text-base   hover:scale-110  active:scale-95 duration-200 hover:bg-[rgb(174,93,46)] hover:text-[rgb(248,255,213)] ${metal.className} py-2 rounded-md bg-[rgb(248,255,213)]`}
         >
           {"Claim $BTY"}
@@ -164,7 +158,9 @@ const Index = () => {
             animate={{ rotate: 720 }}
             className={`w-[250px] h-[250px] items-center justify-center flex bg-slate-500 rounded-full`}
           >
-            {Nft && <Image fill src={Nft} alt='Nft' />}
+            {typeof Nft?.image == "string" && (
+              <Image width={250} height={250} src={Nft?.image} alt='Nft' />
+            )}
           </motion.div>
           <h1
             className={`${metal.className} text-appCream text-[100px] absolute`}
@@ -173,7 +169,7 @@ const Index = () => {
           </h1>
         </div>
         <button
-          disabled={level <= 5}
+          // disabled={level <= 5}
           onClick={mintNFT}
           className={`px-6 text-black disabled:text-[rgb(174,93,46)] disabled:opacity-30 disabled:scale-100 disabled:bg-[rgb(248,255,233)] disabled:text-base   hover:scale-110  active:scale-95 duration-200 hover:bg-[rgb(174,93,46)] hover:text-[rgb(248,255,213)] ${metal.className} py-2 rounded-md bg-[rgb(248,255,213)]`}
         >

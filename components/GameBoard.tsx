@@ -195,7 +195,7 @@ const GameBoard: React.FC = () => {
                       "-translate-y-[95%]"
                     : ""
                 } bg-[#C89933] ${
-                  tries == level * 4 ? "translate-y-[0%]" : ""
+                  tries == level * 5 ? "translate-y-[0%]" : ""
                 } z-20 relative  duration-[3000ms] h-full border border-teal-950 flex justify-center items-center`}
               >
                 <button

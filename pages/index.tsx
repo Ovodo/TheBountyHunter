@@ -10,12 +10,12 @@ import Mute from "@/components/alert/Mute";
 import { postAddress } from "@/utils/databaseMethods";
 import useFonts from "@/hooks/useFonts";
 import Image from "next/image";
+import HomeImage from "@/public/assets/images/hunter-1.png";
 
 const menuItems = [
   "Start",
   "Hunter",
   "Shop",
-  "Instructions",
   "Rewards",
   "Instructions",
   "Leave",
@@ -26,8 +26,8 @@ export default function Home() {
   const [user, setUser] = React.useState<string | null>(null);
   const [address, setAddress] = React.useState<string | null>(null);
   const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const { Stop, Move, Crash } = useGameSounds();
+  const [isLoading, setIsLoading] = useState(!true);
+  const { Stop, Move, Crash, Suspense, Write } = useGameSounds();
   const router = useRouter();
   const { passports, provider } = usePassport();
 
@@ -103,6 +103,12 @@ export default function Home() {
         case "Enter":
           Stop();
           Crash.play();
+          setTimeout(() => {
+            Suspense.play();
+            Suspense.fade(0, 1, 7000);
+            Write();
+          }, 2000);
+          Suspense;
           setSelectedMenuIndex((currentSelectedIndex) => {
             handleMenuAction(currentSelectedIndex);
             return currentSelectedIndex;
@@ -114,7 +120,7 @@ export default function Home() {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [Crash, Move, Stop, handleMenuAction]);
+  }, [Crash, Move, Suspense, Write, Stop, handleMenuAction]);
 
   useEffect(() => {
     setUser(sessionStorage.getItem("name"));
@@ -163,11 +169,12 @@ export default function Home() {
             {user ? user : ""}
           </p>
         </div>
-        <div className='w-[57%]  h-full'>
+        <div className='w-screen -z-10 absolute flex items-center justify-center h-screen'>
           <Image
+            priority={true}
             fill
-            className='object-scale-down -z-[5] absolute'
-            src='/assets/images/hunter-1.png'
+            className=' -z-[5] object-scale-down  border-4 border-y-purple-300 self-center'
+            src={HomeImage}
             alt='main- image'
           />
         </div>

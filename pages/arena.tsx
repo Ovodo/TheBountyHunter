@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import Spin from "@/components/layout/Spin";
 import useSound from "use-sound";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { setWinner } from "@/redux/features/gameSlice";
+import { setTries, setWinner } from "@/redux/features/gameSlice";
 import NotificationEvent from "@/components/alert/NotificationEvent";
 import useGameSounds from "@/hooks/useGameSounds";
 import Mute from "@/components/alert/Mute";
@@ -34,10 +34,10 @@ const Arena = () => {
     setIsLoading(true);
     setTimeup(false); // set timup to true
     setTimeout(() => {
-      // dispatch(reset());
+      dispatch(setTries());
+      dispatch(setWinner(false));
       setIsLoading(false);
     }, 300);
-    dispatch(setWinner(false));
 
     Stop();
     setTimeout(() => {

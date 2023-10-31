@@ -1,4 +1,3 @@
-"use client";
 import PageLoader from "@/components/layout/PageLoader";
 import usePassport from "@/hooks/usePassport";
 import { useRouter } from "next/router";

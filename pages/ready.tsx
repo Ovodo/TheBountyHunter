@@ -55,24 +55,23 @@ const Index = () => {
     function handleKeyDown(event: KeyboardEvent) {
       switch (event.key) {
         case "ArrowUp":
-          setSelectedBossIndex((prevIndex) => {
-            if (prevIndex > 0 && boss[prevIndex - 1].level <= level) {
-              Move.play();
+          if (
+            selectedBossIndex > 0 &&
+            boss[selectedBossIndex - 1].level <= level
+          ) {
+            Move.play();
+            setSelectedBossIndex((prevIndex) => {
               return prevIndex - 1;
-            } else {
-              return prevIndex;
-            }
-          });
+            });
+          }
           break;
         case "ArrowDown":
-          setSelectedBossIndex((prevIndex) => {
-            if (prevIndex < boss.length - 1) {
-              Move.play();
+          if (selectedBossIndex < boss.length - 1) {
+            Move.play();
+            setSelectedBossIndex((prevIndex) => {
               return prevIndex + 1;
-            } else {
-              return prevIndex;
-            }
-          });
+            });
+          }
           break;
 
         case "Enter":
@@ -102,17 +101,7 @@ const Index = () => {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [Main, Move, Stop, dispatch, level, playBeep, router]);
-  useEffect(() => {
-    setTimeout(() => Write(), 500);
-    Suspense.stop();
-    Suspense.play();
-    Suspense.fade(0, 1, 7000);
-
-    return () => {
-      Stop();
-    };
-  }, [Stop, Suspense, Write]);
+  }, [Move, Stop, dispatch, level, playBeep, router]);
 
   useEffect(() => {
     async function fetchDetails() {
@@ -200,6 +189,7 @@ const Index = () => {
             animate={{ rotate: 720 }}
           >
             <Image
+              priority
               fill
               className={` rounded-full`}
               src='/assets/images/jing-sun.jpg'
@@ -210,7 +200,7 @@ const Index = () => {
             Jing-Sun
           </h2>
         </div>
-        <div className='h-[95%]  relative scrollbar-hid overflow-scroll w-[40%]'>
+        <div className='h-[95%]  relative scrollbar-hide overflow-scroll w-[40%]'>
           <div className='fixed w-full bottom-[50px] h-[15px] z-20 opacity-10   [background:linear-gradient(360deg,rgba(0,0,0,0.8)_1.46%,rgba(13.63,20.14,12,0.72)_13.34%,rgba(50.7,74.92,44.64,0.5)_27.53%,rgba(91.64,135.43,80.69,0.26)_50.29%,rgba(135.88,200.81,119.65,0.04)_56.65%,rgba(103.44,163.01,88.54,0.21)_63.93%,rgba(48.61,99.14,35.98,0.56)_73.16%,rgba(22.79,69.06,11.22,0.72)_83.68%)] ' />
           <motion.div
             className='max-h-max relative pt-[200px]'
@@ -247,6 +237,8 @@ const Index = () => {
                   >
                     <Image
                       fill
+                      priority
+                      className='rounded-full'
                       src={`/assets/images${item.src}`}
                       alt='hunter'
                     />
