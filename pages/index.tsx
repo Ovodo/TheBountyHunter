@@ -4,7 +4,6 @@ import usePassport from "@/hooks/usePassport";
 import { useRouter } from "next/router";
 import Layout from "@/components/layout";
 import PageLoader from "@/components/layout/PageLoader";
-import { transferTokens } from "@/utils/contractMethods";
 import useGameSounds from "@/hooks/useGameSounds";
 import Mute from "@/components/alert/Mute";
 import { postAddress } from "@/utils/databaseMethods";
@@ -12,7 +11,6 @@ import useFonts from "@/hooks/useFonts";
 import Image from "next/image";
 import HomeImage from "@/public/assets/images/hunter-1.png";
 import NotificationEvent from "@/components/alert/NotificationEvent";
-import { log } from "console";
 
 const menuItems = [
   "Start",
@@ -35,32 +33,25 @@ export default function Home() {
 
   const Login = async () => {
     setIsLoading(true);
-    console.log("tesst");
 
+    const accounts = await provider.request({
+      method: "eth_requestAccounts",
+    });
+    console.log("requesting user info");
+
+    let user = await passports.getUserInfo();
+
+    sessionStorage.setItem("name", user?.email?.split("@")[0] as string);
+    setUser(sessionStorage.getItem("name"));
+
+    sessionStorage.setItem("address", accounts[0] as string);
+    setAddress(sessionStorage.getItem("address"));
     try {
-      const accounts = await provider.request({
-        method: "eth_requestAccounts",
-      });
-      console.log("requesting user info");
-
-      console.log(accounts);
+      const response = await postAddress(accounts[0] as string);
+      console.log(response);
     } catch (error) {
-      console.log(error);
+      console.error("Error posting address:", error);
     }
-
-    // let user = await passports.getUserInfo();
-
-    // sessionStorage.setItem("name", user?.email?.split("@")[0] as string);
-    // setUser(sessionStorage.getItem("name"));
-
-    // sessionStorage.setItem("address", accounts[0] as string);
-    // setAddress(sessionStorage.getItem("address"));
-    // try {
-    //   const response = await postAddress(accounts[0] as string);
-    //   console.log(response);
-    // } catch (error) {
-    //   console.error("Error posting address:", error);
-    // }
     setIsLoading(false);
   };
 
@@ -168,7 +159,9 @@ export default function Home() {
               metal.className
             } w-[300px] bg-clip-text [-webkit-text-fill-color:transparent] [text-fill-color:transparent] text-transparent text-[20px]  tracking-[0] leading-[normal]`}
           >
-            Connect your passport to begin
+            {address !== null
+              ? "Press Start"
+              : " Connect your passport to begin"}
           </p>
           <button
             disabled={address ? true : false}
@@ -197,7 +190,11 @@ export default function Home() {
         >
           {menuItems.map((item, index) => (
             <button
-              disabled={item === "Shop" || item === "Hunter" ? true : false}
+              disabled={
+                item === "Shop" || item === "Hunter" || address === null
+                  ? true
+                  : false
+              }
               key={index.toString()}
               onMouseEnter={() => {
                 setSelectedMenuIndex(index);

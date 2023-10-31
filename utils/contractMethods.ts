@@ -28,7 +28,7 @@ export async function getData(token_id: string) {
       tokenId: token_id,
     });
 
-    console.log(response.result);
+    // console.log(response.result);
     return response.result;
   } catch (error) {
     console.error(error);
@@ -110,7 +110,7 @@ export const mintRandom = async (provider: Provider) => {
   const userAddress = await signer.getAddress();
 
   const contract: RewardNft = RewardNft__factory.connect(
-    ERC40_CONTRACT,
+    CONTRACT_ADDRESS,
     signer
   );
   const MAX_TRIES = 5;
@@ -134,9 +134,9 @@ export const mintRandom = async (provider: Provider) => {
 
     if (!isMinted) {
       // Mint the token if not already minted
-      const hash = await contract.safeMint(userAddress, token_id);
+      const hash = await contract.primarySale(token_id);
       await hash.wait();
-      const nftData = getData(token_id.toString());
+      const nftData = await getData(token_id.toString());
 
       minted = true;
       return nftData;
