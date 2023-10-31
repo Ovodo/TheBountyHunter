@@ -32,16 +32,19 @@ const Index = () => {
   const { provider } = usePassport();
 
   const fetchDetails = useCallback(async () => {
+    const address = sessionStorage.getItem("address") as string;
+    if (!address) {
+      alert("No User Found");
+      return;
+    }
     try {
-      const response = await getDetails(
-        sessionStorage.getItem("address") as string
-      );
+      const response = await getDetails(address);
       dispatch(newUser(response.data));
 
       console.log(response);
-      // const balance = await getBalance();
+      const balance = await getBalance(provider);
 
-      // SetBalance(balance);
+      SetBalance(balance);
 
       return response;
     } catch (error) {
@@ -55,13 +58,12 @@ const Index = () => {
     try {
       if (Rewards == 0) {
         alert("You have no Rewards 💲 to claim");
+        setIsLoading(false);
         return;
       }
 
       const balance = await transferTokens(provider, Rewards.toString());
       await claimRewards(address, Rewards.toString());
-      // const balance = await getBalance();
-
       SetBalance(balance);
     } catch (error) {
       console.log(error);
@@ -72,16 +74,15 @@ const Index = () => {
 
   const mintNFT = async () => {
     setIsLoading(true);
-    // await getBalance(provider);
     const nftData = await mintRandom(provider);
     await mintToken(address, nftData);
 
-    // fetchDetails();
+    fetchDetails();
     setIsLoading(false);
   };
 
   useEffect(() => {
-    // fetchDetails();
+    fetchDetails();
     setIsLoading(false);
   }, []);
   return (
@@ -169,7 +170,7 @@ const Index = () => {
           </h1>
         </div>
         <button
-          // disabled={level <= 5}
+          disabled={level <= 5}
           onClick={mintNFT}
           className={`px-6 text-black disabled:text-[rgb(174,93,46)] disabled:opacity-30 disabled:scale-100 disabled:bg-[rgb(248,255,233)] disabled:text-base   hover:scale-110  active:scale-95 duration-200 hover:bg-[rgb(174,93,46)] hover:text-[rgb(248,255,213)] ${metal.className} py-2 rounded-md bg-[rgb(248,255,213)]`}
         >

@@ -11,6 +11,7 @@ import { postAddress } from "@/utils/databaseMethods";
 import useFonts from "@/hooks/useFonts";
 import Image from "next/image";
 import HomeImage from "@/public/assets/images/hunter-1.png";
+import NotificationEvent from "@/components/alert/NotificationEvent";
 
 const menuItems = [
   "Start",
@@ -38,6 +39,8 @@ export default function Home() {
     const accounts = await provider.request({
       method: "eth_requestAccounts",
     });
+    console.log("requesting user info");
+
     let user = await passports.getUserInfo();
     sessionStorage.setItem("name", user?.email?.split("@")[0] as string);
     setUser(sessionStorage.getItem("name"));
@@ -127,7 +130,10 @@ export default function Home() {
     setAddress(sessionStorage.getItem("address"));
   }, []);
   if (isLoading) {
-    return <PageLoader loading={isLoading} />;
+    return (
+      <div>{isLoading && <NotificationEvent title='Loading...⏳ ' />}</div>
+    );
+    // <PageLoader loading={isLoading} />;
   }
   return (
     <Layout>

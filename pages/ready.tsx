@@ -104,11 +104,15 @@ const Index = () => {
   }, [Move, Stop, dispatch, level, playBeep, router]);
 
   useEffect(() => {
+    const address = sessionStorage.getItem("address") as string;
+    if (!address) {
+      console.log("No User Found");
+      return;
+    }
+
     async function fetchDetails() {
       try {
-        const response = await getDetails(
-          sessionStorage.getItem("address") as string
-        );
+        const response = await getDetails(address);
         console.log(response);
         setUserData(response.data);
         dispatch(newUser(response.data));
@@ -121,11 +125,6 @@ const Index = () => {
     }
     fetchDetails();
   }, [dispatch]);
-  useEffect(() => {
-    if (level) {
-      setSelectedBossIndex(boss.length - level);
-    }
-  }, [level]);
   useEffect(() => {
     if (level) {
       setSelectedBossIndex(boss.length - level);
@@ -185,11 +184,12 @@ const Index = () => {
           </h2>
           <motion.div
             initial={{ rotate: 0 }}
-            className='animate-pulse w-[250px] h-[250px] rounded-full'
+            className='animate-pulse relative w-[250px] h-[250px] rounded-full'
             animate={{ rotate: 720 }}
           >
             <Image
               priority
+              sizes='(max-width: 600px) 100px, (max-width: 1000px) 200px, 300px'
               fill
               className={` rounded-full`}
               src='/assets/images/jing-sun.jpg'
@@ -233,10 +233,11 @@ const Index = () => {
                   <motion.div
                     initial={{ rotate: 0 }}
                     animate={{ rotate: 720 }}
-                    className='w-[250px] object-cover h-[250px] rounded-full'
+                    className='w-[250px] relative object-cover h-[250px] rounded-full'
                   >
                     <Image
                       fill
+                      sizes='(max-width: 600px) 100px, (max-width: 1000px) 200px, 300px'
                       priority
                       className='rounded-full'
                       src={`/assets/images${item.src}`}

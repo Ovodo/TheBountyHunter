@@ -8,9 +8,13 @@ const Index = () => {
   const router = useRouter();
   let { passports } = usePassport();
   React.useEffect(() => {
-    passports.loginCallback();
-    router.push("/");
+    try {
+      passports.loginCallback();
+    } catch (error) {
+      console.log("login error", error);
+    }
 
+    router.push("/");
     return () => {};
   }, [router, passports]);
 
