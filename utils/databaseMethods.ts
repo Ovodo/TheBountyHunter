@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const baseUrl =
   process.env.NODE_ENV === "production"
-    ? "https://bounty-khaki.vercel.app"
+    ? "https://bounty-ovodo.vercel.app"
     : "http://localhost:3000";
 
 export const postAddress = async (address: string) => {
