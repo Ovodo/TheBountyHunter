@@ -165,14 +165,14 @@ const Index = () => {
                 width={250}
                 height={250}
                 className='rounded-full'
-                src={Nft.image}
+                src={Nft?.image}
                 alt='Nft'
               />
             )}
           </motion.div>
           <h1
             className={`${metal.className} ${
-              Nft.image && "hidden"
+              Nft?.image && "hidden"
             } text-appCream text-[100px] absolute`}
           >
             ?
