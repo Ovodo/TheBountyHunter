@@ -165,7 +165,7 @@ const Index = () => {
                 width={250}
                 height={250}
                 className='rounded-full'
-                src={Nft.image}
+                src={Nft?.image}
                 alt='Nft'
               />
             )}
