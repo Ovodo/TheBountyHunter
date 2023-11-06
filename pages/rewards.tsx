@@ -172,7 +172,7 @@ const Index = () => {
           </motion.div>
           <h1
             className={`${metal.className} ${
-              Nft.image && "hidden"
+              Nft?.image && "hidden"
             } text-appCream text-[100px] absolute`}
           >
             ?
